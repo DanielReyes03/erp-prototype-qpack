@@ -91,7 +91,7 @@ export default function MovimientosTesoreriaPage() {
         searchPlaceholder="Buscar por descripción o referencia…"
       >
         <select
-          className="h-8 rounded-md border border-slate-200 bg-white px-2 text-sm text-slate-700"
+          className="h-8 rounded-xl border border-slate-200 bg-white shadow-surface px-2 text-sm text-slate-700"
           value={cuentaFilter}
           onChange={(e) => setCuentaFilter(e.target.value)}
         >

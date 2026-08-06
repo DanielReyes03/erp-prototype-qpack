@@ -25,7 +25,7 @@ export function FilterBar({
   return (
     <div
       className={cn(
-        "mb-3 flex flex-wrap items-center gap-2 rounded-md border border-slate-200 bg-white p-2.5",
+        "mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white shadow-surface p-2.5",
         className,
       )}
     >

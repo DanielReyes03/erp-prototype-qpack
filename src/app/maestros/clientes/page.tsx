@@ -9,6 +9,7 @@ import { DataTable, type DataTableColumn } from "@/components/patterns/DataTable
 import { MoneyCell } from "@/components/patterns/MoneyCell";
 import { StatusChip } from "@/components/patterns/StatusChip";
 import { ConfirmDialog } from "@/components/patterns/ConfirmDialog";
+import { EntityAvatar } from "@/components/patterns/EntityAvatar";
 import { useClientesStore } from "@/lib/store/clientes";
 import type { Cliente } from "@/lib/seed/clientes";
 import { DEPARTAMENTOS, MUNICIPIOS } from "@/lib/seed/geografia";
@@ -55,9 +56,12 @@ export default function ClientesPage() {
       header: "Cliente",
       sortAccessor: (c) => c.nombreComercial,
       cell: (c) => (
-        <div className="flex flex-col">
-          <span className="font-medium text-slate-900">{c.nombreComercial}</span>
-          <span className="text-xs text-slate-500">{c.razonSocial}</span>
+        <div className="flex items-center gap-2.5">
+          <EntityAvatar name={c.nombreComercial} />
+          <div className="flex flex-col">
+            <span className="font-medium text-slate-900">{c.nombreComercial}</span>
+            <span className="text-xs text-slate-500">{c.razonSocial}</span>
+          </div>
         </div>
       ),
     },
@@ -128,7 +132,7 @@ export default function ClientesPage() {
         searchPlaceholder="Buscar por nombre, razón social o NIT…"
       >
         <select
-          className="h-8 rounded-md border border-slate-200 bg-white px-2 text-sm text-slate-700"
+          className="h-8 rounded-xl border border-slate-200 bg-white shadow-surface px-2 text-sm text-slate-700"
           value={departamentoFilter}
           onChange={(e) => setDepartamentoFilter(e.target.value)}
         >

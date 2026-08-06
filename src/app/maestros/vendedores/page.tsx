@@ -8,6 +8,7 @@ import { FilterBar } from "@/components/patterns/FilterBar";
 import { DataTable, type DataTableColumn } from "@/components/patterns/DataTable";
 import { StatusChip } from "@/components/patterns/StatusChip";
 import { ConfirmDialog } from "@/components/patterns/ConfirmDialog";
+import { EntityAvatar } from "@/components/patterns/EntityAvatar";
 import { useVendedoresStore } from "@/lib/store/vendedores";
 import type { Vendedor } from "@/lib/seed/vendedores";
 import { VendedorFormModal } from "./_components/VendedorFormModal";
@@ -36,9 +37,12 @@ export default function VendedoresPage() {
       header: "Vendedor",
       sortAccessor: (v) => v.nombre,
       cell: (v) => (
-        <div className="flex flex-col">
-          <span className="font-medium text-slate-900">{v.nombre}</span>
-          <span className="text-xs text-slate-500">{v.email}</span>
+        <div className="flex items-center gap-2.5">
+          <EntityAvatar name={v.nombre} />
+          <div className="flex flex-col">
+            <span className="font-medium text-slate-900">{v.nombre}</span>
+            <span className="text-xs text-slate-500">{v.email}</span>
+          </div>
         </div>
       ),
     },

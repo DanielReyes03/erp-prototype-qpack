@@ -21,7 +21,7 @@ function DepartamentosMunicipios() {
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[260px_1fr]">
-      <div className="rounded-md border border-slate-200 bg-white">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-surface">
         <ul className="max-h-[520px] overflow-y-auto py-1" data-scrollbar="thin">
           {DEPARTAMENTOS.map((d) => (
             <li key={d.id}>
@@ -50,7 +50,7 @@ function DepartamentosMunicipios() {
         </ul>
       </div>
 
-      <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-surface">
         <div className="border-b border-slate-200 px-4 py-2.5">
           <p className="text-sm font-semibold text-slate-900">
             Municipios de {DEPARTAMENTOS.find((d) => d.id === selected)?.nombre}
@@ -71,7 +71,7 @@ function DepartamentosMunicipios() {
 
 function ZonasCapital() {
   return (
-    <div className="rounded-md border border-slate-200 bg-white p-4">
+    <div className="rounded-xl border border-slate-200 bg-white shadow-surface p-4">
       <p className="mb-3 text-sm text-slate-500">
         Zonas de referencia para direcciones fiscales en Guatemala y Mixco. Se usan como campo
         libre en clientes, proveedores y locaciones.

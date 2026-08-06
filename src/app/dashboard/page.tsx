@@ -109,13 +109,13 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-md border border-slate-200 bg-white p-4 lg:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-surface p-4 lg:col-span-2">
           <h2 className="text-sm font-semibold text-slate-900">Ventas de los últimos 6 meses</h2>
           <p className="mb-2 text-xs text-slate-500">Facturación neta, DTEs certificados (GTQ)</p>
           <SalesTrendChart data={SALES_TREND} />
         </div>
 
-        <div className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-surface p-4">
           <h2 className="text-sm font-semibold text-slate-900">Top 5 productos del mes</h2>
           <p className="mb-2 text-xs text-slate-500">Por monto vendido</p>
           <ul className="divide-y divide-slate-200">
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-md border border-slate-200 bg-white">
+      <div className="mt-4 rounded-xl border border-slate-200 bg-white shadow-surface">
         <div className="border-b border-slate-200 p-4">
           <h2 className="text-sm font-semibold text-slate-900">Documentos pendientes de acción</h2>
           <p className="text-xs text-slate-500">
@@ -145,17 +145,17 @@ export default function DashboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-navy-900 text-left text-white">
-                <th className="px-4 py-2 text-xs font-medium tracking-wide uppercase">Documento</th>
-                <th className="px-4 py-2 text-xs font-medium tracking-wide uppercase">Tipo</th>
-                <th className="px-4 py-2 text-xs font-medium tracking-wide uppercase">
+              <tr className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
+                <th className="px-4 py-2 text-xs font-semibold tracking-wide uppercase">Documento</th>
+                <th className="px-4 py-2 text-xs font-semibold tracking-wide uppercase">Tipo</th>
+                <th className="px-4 py-2 text-xs font-semibold tracking-wide uppercase">
                   Contraparte
                 </th>
-                <th className="px-4 py-2 text-xs font-medium tracking-wide uppercase">Estado</th>
-                <th className="px-4 py-2 text-right text-xs font-medium tracking-wide uppercase">
+                <th className="px-4 py-2 text-xs font-semibold tracking-wide uppercase">Estado</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold tracking-wide uppercase">
                   Monto
                 </th>
-                <th className="px-4 py-2 text-xs font-medium tracking-wide uppercase">Fecha</th>
+                <th className="px-4 py-2 text-xs font-semibold tracking-wide uppercase">Fecha</th>
               </tr>
             </thead>
             <tbody>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
                   <td className="px-4 text-slate-700">{doc.contraparte}</td>
                   <td className="px-4">
                     <span
-                      className={`inline-flex rounded-sm px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[doc.estado] ?? "bg-slate-100 text-slate-700"}`}
+                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[doc.estado] ?? "bg-slate-100 text-slate-700"}`}
                     >
                       {doc.estado}
                     </span>

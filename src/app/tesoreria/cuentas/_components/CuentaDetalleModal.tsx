@@ -46,7 +46,7 @@ export function CuentaDetalleModal({ isOpen, onOpenChange, cuenta }: CuentaDetal
             <div className="overflow-hidden rounded-md border border-slate-200">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="h-9 bg-navy-900 text-left text-[11px] font-medium tracking-wide text-white/90 uppercase">
+                  <tr className="h-9 border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
                     <th className="px-3">Fecha</th>
                     <th className="px-3">Movimiento</th>
                     <th className="px-3">Descripción</th>

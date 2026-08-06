@@ -79,7 +79,7 @@ export default function NuevaOrdenVentaPage() {
         }
       />
 
-      <div className="mb-4 grid grid-cols-1 gap-4 rounded-md border border-slate-200 bg-white p-4 sm:grid-cols-3">
+      <div className="mb-4 grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white shadow-surface p-4 sm:grid-cols-3">
         <Select
           className="flex flex-col gap-1"
           placeholder="Seleccionar cliente"
@@ -144,7 +144,7 @@ export default function NuevaOrdenVentaPage() {
         </div>
       )}
 
-      <div className="rounded-md border border-slate-200 bg-white p-4">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-surface p-4">
         <Label>Notas</Label>
         <TextArea
           className="mt-1"

@@ -8,6 +8,7 @@ import { FilterBar } from "@/components/patterns/FilterBar";
 import { DataTable, type DataTableColumn } from "@/components/patterns/DataTable";
 import { StatusChip } from "@/components/patterns/StatusChip";
 import { ConfirmDialog } from "@/components/patterns/ConfirmDialog";
+import { EntityAvatar } from "@/components/patterns/EntityAvatar";
 import { useProveedoresStore } from "@/lib/store/proveedores";
 import type { Proveedor } from "@/lib/seed/proveedores";
 import { DEPARTAMENTOS, MUNICIPIOS } from "@/lib/seed/geografia";
@@ -47,9 +48,12 @@ export default function ProveedoresPage() {
       header: "Proveedor",
       sortAccessor: (p) => p.nombreComercial,
       cell: (p) => (
-        <div className="flex flex-col">
-          <span className="font-medium text-slate-900">{p.nombreComercial}</span>
-          <span className="text-xs text-slate-500">{p.razonSocial}</span>
+        <div className="flex items-center gap-2.5">
+          <EntityAvatar name={p.nombreComercial} />
+          <div className="flex flex-col">
+            <span className="font-medium text-slate-900">{p.nombreComercial}</span>
+            <span className="text-xs text-slate-500">{p.razonSocial}</span>
+          </div>
         </div>
       ),
     },

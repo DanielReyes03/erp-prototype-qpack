@@ -85,7 +85,7 @@ export default function OrdenesCompraPage() {
         searchPlaceholder="Buscar por número de orden o proveedor…"
       >
         <select
-          className="h-8 rounded-md border border-slate-200 bg-white px-2 text-sm text-slate-700"
+          className="h-8 rounded-xl border border-slate-200 bg-white shadow-surface px-2 text-sm text-slate-700"
           value={estadoFilter}
           onChange={(e) => setEstadoFilter(e.target.value)}
         >

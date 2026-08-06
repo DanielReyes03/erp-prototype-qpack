@@ -109,7 +109,7 @@ export default function OrdenCompraDetallePage() {
         actions={<StatusChip status={`oc:${orden.estado}`} />}
       />
 
-      <div className="mb-5 rounded-md border border-slate-200 bg-white p-5">
+      <div className="mb-5 rounded-xl border border-slate-200 bg-white shadow-surface p-5">
         <DocumentStepper steps={steps} currentKey={currentKey} cancelled={cancelled} />
         {cancelled && orden.motivoAnulacion ? (
           <p className="mt-3 text-sm text-slate-500">
@@ -119,7 +119,7 @@ export default function OrdenCompraDetallePage() {
         ) : null}
       </div>
 
-      <div className="mb-4 grid grid-cols-1 gap-4 rounded-md border border-slate-200 bg-white p-4 sm:grid-cols-2">
+      <div className="mb-4 grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white shadow-surface p-4 sm:grid-cols-2">
         <div>
           <p className="text-xs text-slate-500">Proveedor</p>
           <p className="text-sm font-medium text-slate-900">{proveedor.nombreComercial}</p>
@@ -136,10 +136,10 @@ export default function OrdenCompraDetallePage() {
           <LineItemsEditor items={lineas} onChange={setLineas} products={products} currency={orden.moneda} />
         </div>
       ) : (
-        <div className="mb-4 overflow-hidden rounded-md border border-slate-200 bg-white">
+        <div className="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-surface">
           <table className="w-full text-sm">
             <thead>
-              <tr className="h-10 border-b border-slate-200 bg-navy-900 text-left text-[11px] font-medium tracking-wide text-white/90 uppercase">
+              <tr className="h-10 border-b border-slate-200 border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
                 <th className="px-3">Producto</th>
                 <th className="px-3 text-right">Ordenado</th>
                 <th className="px-3 text-right">Recibido</th>

@@ -127,11 +127,11 @@ export function LineItemsEditor({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-surface">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[880px] text-sm">
             <thead>
-              <tr className="h-10 border-b border-slate-200 bg-navy-900 text-left text-[11px] font-medium tracking-wide text-white/90 uppercase">
+              <tr className="h-10 border-b border-slate-200 border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
                 <th className="px-3">Producto</th>
                 <th className="w-24 px-3 text-right">Cantidad</th>
                 <th className="w-32 px-3 text-right">Precio unit.</th>
@@ -293,7 +293,7 @@ export function LineItemsEditor({
       </div>
 
       <div className="flex justify-end">
-        <div className={cn("w-full max-w-xs space-y-1.5 rounded-md border border-slate-200 bg-white p-4")}>
+        <div className={cn("w-full max-w-xs space-y-1.5 rounded-xl border border-slate-200 bg-white shadow-surface p-4")}>
           <TotalRow label="Subtotal" value={totals.subtotal} currency={currency} />
           {totals.descuento > 0 ? (
             <TotalRow label="Descuento" value={-totals.descuento} currency={currency} />

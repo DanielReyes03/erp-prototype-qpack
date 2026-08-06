@@ -40,11 +40,11 @@ export default function CuentasBancariasPage() {
       />
 
       <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-surface p-4">
           <p className="text-xs font-medium text-slate-500">Total en quetzales</p>
           <p className="font-data mt-1 text-2xl font-semibold text-slate-900">{`Q ${totalGTQ.toLocaleString("en-US", { minimumFractionDigits: 2 })}`}</p>
         </div>
-        <div className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-surface p-4">
           <p className="text-xs font-medium text-slate-500">Total en dólares</p>
           <p className="font-data mt-1 text-2xl font-semibold text-slate-900">{`$ ${totalUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}`}</p>
         </div>
@@ -56,7 +56,7 @@ export default function CuentasBancariasPage() {
             key={c.id}
             type="button"
             onClick={() => setDetalle(c)}
-            className="flex flex-col gap-3 rounded-md border border-slate-200 bg-white p-4 text-left hover:border-blue-500"
+            className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white shadow-surface p-4 text-left hover:border-blue-500"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">

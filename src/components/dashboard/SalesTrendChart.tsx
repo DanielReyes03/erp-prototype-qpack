@@ -93,7 +93,7 @@ export function SalesTrendChart({ data }: { data: SalesPoint[] }) {
 
       {hovered !== null && (
         <div
-          className="pointer-events-none absolute top-2 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-md"
+          className="pointer-events-none absolute top-2 rounded-xl border border-slate-200 bg-white shadow-surface px-2.5 py-1.5 text-xs shadow-md"
           style={{
             left: `${((hovered + 0.5) / data.length) * 100}%`,
             transform: "translateX(-50%)",

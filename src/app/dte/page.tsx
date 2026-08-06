@@ -95,7 +95,7 @@ export default function DtePage() {
         searchPlaceholder="Buscar por número, UUID o cliente…"
       >
         <select
-          className="h-8 rounded-md border border-slate-200 bg-white px-2 text-sm text-slate-700"
+          className="h-8 rounded-xl border border-slate-200 bg-white shadow-surface px-2 text-sm text-slate-700"
           value={tipoFilter}
           onChange={(e) => setTipoFilter(e.target.value)}
         >
@@ -105,7 +105,7 @@ export default function DtePage() {
           <option value="NDEB">Nota de débito</option>
         </select>
         <select
-          className="h-8 rounded-md border border-slate-200 bg-white px-2 text-sm text-slate-700"
+          className="h-8 rounded-xl border border-slate-200 bg-white shadow-surface px-2 text-sm text-slate-700"
           value={estadoFilter}
           onChange={(e) => setEstadoFilter(e.target.value)}
         >

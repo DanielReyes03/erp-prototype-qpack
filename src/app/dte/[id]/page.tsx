@@ -69,7 +69,7 @@ export default function DteDetallePage() {
       ) : null}
 
       {/* Representación gráfica del DTE */}
-      <div className="mx-auto max-w-3xl rounded-md border border-slate-200 bg-white p-8 print:border-0 print:shadow-none">
+      <div className="mx-auto max-w-3xl rounded-xl border border-slate-200 bg-white shadow-surface p-8 print:border-0 print:shadow-none">
         <div className="mb-6 flex items-start justify-between border-b border-slate-200 pb-6">
           <div>
             <p className="text-lg font-semibold text-navy-900">QPack Importadora, S.A.</p>

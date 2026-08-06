@@ -111,7 +111,7 @@ export function DataTable<T>({
   const showEmpty = !isLoading && pageRows.length === 0;
 
   return (
-    <div className={cn("overflow-hidden rounded-md border border-slate-200 bg-white", className)}>
+    <div className={cn("overflow-hidden rounded-xl border border-slate-200 bg-white shadow-surface", className)}>
       <Table variant="secondary" className="bg-transparent">
         <Table.ScrollContainer>
           <Table.Content
@@ -135,7 +135,7 @@ export function DataTable<T>({
               {[
                 ...(selectable
                   ? [
-                      <Table.Column key="__select" className="w-10 bg-navy-900 pe-0">
+                      <Table.Column key="__select" className="w-10 bg-slate-50 pe-0">
                         <Checkbox aria-label="Seleccionar todo" slot="selection" variant="secondary">
                           <Checkbox.Content>
                             <Checkbox.Control>
@@ -153,7 +153,7 @@ export function DataTable<T>({
                     isRowHeader={col === columns[0]}
                     allowsSorting={Boolean(col.sortAccessor)}
                     className={cn(
-                      "h-10 bg-navy-900 py-0 text-[11px] font-medium tracking-wide text-white/90 uppercase",
+                      "h-10 border-b border-slate-200 bg-slate-50 py-0 text-[11px] font-semibold tracking-wide text-slate-500 uppercase",
                       ALIGN_CLASS[col.align ?? "left"],
                       col.headerClassName,
                     )}
@@ -170,7 +170,7 @@ export function DataTable<T>({
                   </Table.Column>
                 )),
                 ...(rowActions
-                  ? [<Table.Column key="__actions" className="w-10 bg-navy-900" />]
+                  ? [<Table.Column key="__actions" className="w-10 bg-slate-50" />]
                   : []),
               ]}
             </Table.Header>

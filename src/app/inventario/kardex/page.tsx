@@ -114,7 +114,7 @@ export default function KardexPage() {
         description="Movimientos de inventario por producto, con costo promedio ponderado recalculado en vivo"
       />
 
-      <div className="mb-4 grid grid-cols-1 gap-4 rounded-md border border-slate-200 bg-white p-4 sm:grid-cols-2">
+      <div className="mb-4 grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white shadow-surface p-4 sm:grid-cols-2">
         <Select
           className="flex flex-col gap-1"
           placeholder="Seleccionar producto"
@@ -168,7 +168,7 @@ export default function KardexPage() {
       {producto ? (
         <div
           className={cn(
-            "mb-4 flex items-center justify-between rounded-md border border-slate-200 bg-white p-4",
+            "mb-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white shadow-surface p-4",
           )}
         >
           <div>

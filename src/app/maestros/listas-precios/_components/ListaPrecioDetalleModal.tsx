@@ -59,7 +59,7 @@ export function ListaPrecioDetalleModal({
             <div className="max-h-[420px] overflow-y-auto rounded-md border border-slate-200">
               <table className="w-full text-sm">
                 <thead className="sticky top-0">
-                  <tr className="h-9 bg-navy-900 text-left text-[11px] font-medium tracking-wide text-white/90 uppercase">
+                  <tr className="h-9 border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
                     <th className="px-3">Producto</th>
                     <th className="w-32 px-3 text-right">Precio</th>
                   </tr>

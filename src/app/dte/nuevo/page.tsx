@@ -120,7 +120,7 @@ function NuevoDteContent() {
       />
 
       {!ordenOrigen ? (
-        <div className="mb-4 rounded-md border border-slate-200 bg-white p-4">
+        <div className="mb-4 rounded-xl border border-slate-200 bg-white shadow-surface p-4">
           <Tabs
             selectedKey={tipo}
             onSelectionChange={(k) => {
@@ -143,7 +143,7 @@ function NuevoDteContent() {
         </div>
       ) : null}
 
-      <div className="mb-4 grid grid-cols-1 gap-4 rounded-md border border-slate-200 bg-white p-4 sm:grid-cols-2">
+      <div className="mb-4 grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white shadow-surface p-4 sm:grid-cols-2">
         {isNota ? (
           <Select
             className="flex flex-col gap-1"
@@ -203,10 +203,10 @@ function NuevoDteContent() {
       </div>
 
       {ordenOrigen ? (
-        <div className="mb-4 overflow-hidden rounded-md border border-slate-200 bg-white">
+        <div className="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-surface">
           <table className="w-full text-sm">
             <thead>
-              <tr className="h-10 border-b border-slate-200 bg-navy-900 text-left text-[11px] font-medium tracking-wide text-white/90 uppercase">
+              <tr className="h-10 border-b border-slate-200 border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
                 <th className="px-3">Producto</th>
                 <th className="px-3 text-right">Cantidad</th>
                 <th className="px-3 text-right">Precio unit.</th>
