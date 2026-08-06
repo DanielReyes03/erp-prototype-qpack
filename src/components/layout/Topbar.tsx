@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Bell, RotateCcw, Building2, ChevronDown } from "lucide-react";
-import { Button, Dropdown, Label, Popover, Kbd, Avatar, Badge } from "@heroui/react";
+import { Search, Bell, RotateCcw, Building2, ChevronDown, UserCog } from "lucide-react";
+import { Button, Dropdown, Label, Description, Popover, Kbd, Avatar, Badge, Separator } from "@heroui/react";
 import { useUiStore } from "@/lib/store/ui";
 import { resetDemoData } from "@/lib/store/reset";
 import { ConfirmDialog } from "@/components/patterns/ConfirmDialog";
+import { useSeguridadStore, useUsuarioActual } from "@/lib/store/seguridad";
 import { Breadcrumb } from "./Breadcrumb";
 
 const COMPANIES = [
@@ -32,6 +33,11 @@ const NOTIFICATIONS = [
   },
 ];
 
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+
 export function Topbar() {
   const router = useRouter();
   const activeCompanyId = useUiStore((s) => s.activeCompanyId);
@@ -39,10 +45,16 @@ export function Topbar() {
   const setCommandPaletteOpen = useUiStore((s) => s.setCommandPaletteOpen);
   const [isResetOpen, setResetOpen] = useState(false);
 
+  const usuarios = useSeguridadStore((s) => s.usuarios);
+  const roles = useSeguridadStore((s) => s.roles);
+  const setCurrentUser = useSeguridadStore((s) => s.setCurrentUser);
+  const usuarioActual = useUsuarioActual();
+  const rolActual = roles.find((r) => r.id === usuarioActual?.rolId);
+
   const activeCompany = COMPANIES.find((c) => c.id === activeCompanyId) ?? COMPANIES[0];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-4 border-b border-slate-200 bg-white px-4">
+    <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200 bg-white px-4 sm:gap-4">
       <div className="min-w-0 flex-1">
         <Breadcrumb />
       </div>
@@ -50,7 +62,7 @@ export function Topbar() {
       <button
         type="button"
         onClick={() => setCommandPaletteOpen(true)}
-        className="hidden items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-500 hover:border-slate-300 hover:bg-white md:flex"
+        className="hidden items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-500 hover:border-slate-300 hover:bg-white xl:flex"
       >
         <Search className="size-4" />
         <span>Buscar…</span>
@@ -63,7 +75,7 @@ export function Topbar() {
       <Button
         isIconOnly
         variant="ghost"
-        className="md:hidden"
+        className="xl:hidden"
         aria-label="Buscar"
         onPress={() => setCommandPaletteOpen(true)}
       >
@@ -73,7 +85,7 @@ export function Topbar() {
       <Dropdown>
         <Button variant="ghost" className="gap-2 text-slate-700">
           <Building2 className="size-4 text-slate-500" />
-          <span className="hidden max-w-[160px] truncate sm:inline">{activeCompany.name}</span>
+          <span className="hidden max-w-[160px] truncate lg:inline">{activeCompany.name}</span>
           <ChevronDown className="size-3.5 text-slate-500" />
         </Button>
         <Dropdown.Popover className="min-w-[260px]">
@@ -119,26 +131,59 @@ export function Topbar() {
         </Popover.Content>
       </Popover>
 
-      <Button variant="ghost" className="gap-2 text-slate-700" onPress={() => setResetOpen(true)}>
+      <Button isIconOnly variant="ghost" className="xl:hidden" aria-label="Restablecer datos de demo" onPress={() => setResetOpen(true)}>
         <RotateCcw className="size-4" />
-        <span className="hidden lg:inline">Restablecer datos de demo</span>
+      </Button>
+      <Button variant="ghost" className="hidden gap-2 text-slate-700 xl:flex" onPress={() => setResetOpen(true)}>
+        <RotateCcw className="size-4" />
+        <span>Restablecer datos de demo</span>
       </Button>
 
       <Dropdown>
         <Dropdown.Trigger className="rounded-full">
           <Avatar size="sm">
-            <Avatar.Fallback>MG</Avatar.Fallback>
+            <Avatar.Fallback>{usuarioActual ? initials(usuarioActual.nombre) : "?"}</Avatar.Fallback>
           </Avatar>
         </Dropdown.Trigger>
-        <Dropdown.Popover className="min-w-[220px]">
+        <Dropdown.Popover className="min-w-[260px]">
           <div className="px-3 pt-3 pb-2">
-            <p className="text-sm leading-5 font-medium text-slate-900">María González</p>
-            <p className="text-xs leading-none text-slate-500">Gerente Comercial</p>
+            <p className="text-sm leading-5 font-medium text-slate-900">{usuarioActual?.nombre ?? "—"}</p>
+            <p className="text-xs leading-none text-slate-500">{rolActual?.nombre ?? "—"}</p>
           </div>
-          <Dropdown.Menu onAction={() => router.push("/seguridad/usuarios")}>
+          <Dropdown.Menu onAction={(key) => key === "seguridad" && router.push("/seguridad/usuarios")}>
             <Dropdown.Item id="seguridad" textValue="Usuarios y roles">
+              <UserCog className="size-4 text-slate-500" />
               <Label>Usuarios y roles</Label>
             </Dropdown.Item>
+          </Dropdown.Menu>
+          <Separator />
+          <div className="px-3 pt-2 pb-1">
+            <p className="text-[11px] font-semibold tracking-wide text-slate-400 uppercase">
+              Cambiar usuario (demo)
+            </p>
+          </div>
+          <Dropdown.Menu
+            selectionMode="single"
+            selectedKeys={new Set(usuarioActual ? [usuarioActual.id] : [])}
+            onSelectionChange={(keys) => {
+              const [id] = Array.from(keys);
+              if (typeof id === "string") setCurrentUser(id);
+            }}
+          >
+            {usuarios
+              .filter((u) => u.activo)
+              .map((u) => {
+                const rol = roles.find((r) => r.id === u.rolId);
+                return (
+                  <Dropdown.Item key={u.id} id={u.id} textValue={u.nombre}>
+                    <Dropdown.ItemIndicator />
+                    <div className="flex flex-col">
+                      <Label>{u.nombre}</Label>
+                      <Description>{rol?.nombre}</Description>
+                    </div>
+                  </Dropdown.Item>
+                );
+              })}
           </Dropdown.Menu>
         </Dropdown.Popover>
       </Dropdown>

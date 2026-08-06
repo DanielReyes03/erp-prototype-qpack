@@ -12,16 +12,20 @@ import { AnularDocumentoModal } from "@/components/patterns/AnularDocumentoModal
 import { MoneyCell } from "@/components/patterns/MoneyCell";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { computeLineBase, computeTotals } from "@/components/patterns/LineItemsEditor";
+import { PolizaCard } from "@/components/patterns/PolizaCard";
 import { useDteStore } from "@/lib/store/dte";
+import { useContabilidadStore } from "@/lib/store/contabilidad";
 import { clienteDe, TIPO_DTE_LABEL } from "../_components/dte-helpers";
 
 export default function DteDetallePage() {
   const params = useParams<{ id: string }>();
   const documentos = useDteStore((s) => s.documentos);
   const anular = useDteStore((s) => s.anular);
+  const getPolizasPorOrigen = useContabilidadStore((s) => s.getPolizasPorOrigen);
   const [anularOpen, setAnularOpen] = useState(false);
 
   const dte = documentos.find((d) => d.id === params.id);
+  const polizas = dte ? getPolizasPorOrigen(dte.id) : [];
 
   if (!dte) {
     return <EmptyState size="page" title="Documento no encontrado" description="El DTE solicitado no existe." />;
@@ -161,6 +165,15 @@ export default function DteDetallePage() {
           Tributario Electrónico (DTE). Prototipo de demostración, sin validez fiscal real.
         </p>
       </div>
+
+      {polizas.length > 0 ? (
+        <div className="mx-auto mt-6 flex max-w-3xl flex-col gap-4 print:hidden">
+          <h2 className="text-sm font-semibold text-slate-900">Póliza contable generada</h2>
+          {polizas.map((p) => (
+            <PolizaCard key={p.id} poliza={p} />
+          ))}
+        </div>
+      ) : null}
 
       <AnularDocumentoModal
         isOpen={anularOpen}

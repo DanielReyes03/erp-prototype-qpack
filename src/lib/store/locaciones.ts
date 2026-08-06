@@ -36,6 +36,6 @@ export const useLocacionesStore = create<LocacionesState>()(
         set({ locaciones: get().locaciones.filter((l) => l.id !== id) });
       },
     }),
-    { name: "qpack-locaciones" },
+    { name: "qpack-locaciones", skipHydration: true },
   ),
 );

@@ -7,6 +7,12 @@ import { CLIENTES_SEED } from "@/lib/seed/clientes";
 import { computeTotals } from "@/components/patterns/LineItemsEditor";
 import { useOrdenesVentaStore } from "@/lib/store/ordenes-venta";
 import { useCxcStore } from "@/lib/store/cxc";
+import { useContabilidadStore } from "@/lib/store/contabilidad";
+import { PRODUCTOS_SEED } from "@/lib/seed/productos";
+
+function round2(n: number): number {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
+}
 
 export interface EmitirDteInput {
   tipo: TipoDte;
@@ -66,7 +72,7 @@ export const useDteStore = create<DteState>()(
 
         if (input.tipo === "FACT") {
           const cliente = CLIENTES_SEED.find((c) => c.id === input.clienteId);
-          const total = computeTotals(input.lineas).total;
+          const totales = computeTotals(input.lineas);
           const fecha = new Date();
           const venc = new Date(fecha);
           venc.setDate(venc.getDate() + (cliente?.diasCredito ?? 15));
@@ -75,10 +81,42 @@ export const useDteStore = create<DteState>()(
             dteId: dte.id,
             fecha: fecha.toISOString(),
             fechaVencimiento: venc.toISOString(),
-            montoOriginal: total,
-            saldoPendiente: total,
+            montoOriginal: totales.total,
+            saldoPendiente: totales.total,
             moneda: input.moneda,
           });
+
+          const { registrarPoliza } = useContabilidadStore.getState();
+          registrarPoliza({
+            tipo: "venta",
+            fecha: dte.fechaCertificacion,
+            concepto: `Venta según factura ${dte.serie}-${dte.numero}`,
+            origen: dte.id,
+            lineas: [
+              { cuentaCodigo: "1.1.04", descripcion: "Clientes Nacionales", debe: totales.total, haber: 0 },
+              { cuentaCodigo: "4.1.01", descripcion: "Ventas Locales", debe: 0, haber: totales.baseGravable },
+              { cuentaCodigo: "2.1.03", descripcion: "IVA Débito Fiscal", debe: 0, haber: totales.iva },
+            ],
+          });
+
+          const costo = round2(
+            input.lineas.reduce((sum, l) => {
+              const producto = PRODUCTOS_SEED.find((p) => p.id === l.productoId);
+              return sum + (producto?.costo ?? 0) * l.cantidad;
+            }, 0),
+          );
+          if (costo > 0) {
+            registrarPoliza({
+              tipo: "venta",
+              fecha: dte.fechaCertificacion,
+              concepto: `Costo de venta según factura ${dte.serie}-${dte.numero}`,
+              origen: dte.id,
+              lineas: [
+                { cuentaCodigo: "5.1.01", descripcion: "Costo de Mercadería Vendida", debe: costo, haber: 0 },
+                { cuentaCodigo: "1.1.06", descripcion: "Inventario de Mercadería", debe: 0, haber: costo },
+              ],
+            });
+          }
         } else if (input.tipo === "NCRE" && input.dteRelacionadoId) {
           // La nota de crédito reduce el saldo pendiente del documento de CxC original.
           const monto = computeTotals(input.lineas).total;
@@ -113,6 +151,6 @@ export const useDteStore = create<DteState>()(
         }
       },
     }),
-    { name: "qpack-dte" },
+    { name: "qpack-dte", skipHydration: true },
   ),
 );

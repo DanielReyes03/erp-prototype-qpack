@@ -42,6 +42,6 @@ export const useVendedoresStore = create<VendedoresState>()(
         set({ vendedores: get().vendedores.map((v) => (v.id === id ? { ...v, activo } : v)) });
       },
     }),
-    { name: "qpack-vendedores" },
+    { name: "qpack-vendedores", skipHydration: true },
   ),
 );

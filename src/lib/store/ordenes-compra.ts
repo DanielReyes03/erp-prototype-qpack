@@ -148,6 +148,6 @@ export const useOrdenesCompraStore = create<OrdenesCompraState>()(
         });
       },
     }),
-    { name: "qpack-ordenes-compra" },
+    { name: "qpack-ordenes-compra", skipHydration: true },
   ),
 );

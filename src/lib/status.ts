@@ -74,6 +74,11 @@ export const STATUS_REGISTRY: Record<string, StatusDef> = {
   "recl:resuelto": { label: "Resuelto", tone: "success" },
   "recl:cerrado": { label: "Cerrado", tone: "default" },
 
+  "prio:baja": { label: "Baja", tone: "default" },
+  "prio:media": { label: "Media", tone: "accent" },
+  "prio:alta": { label: "Alta", tone: "warning" },
+  "prio:urgente": { label: "Urgente", tone: "danger" },
+
   // Traslados / movimientos de inventario
   "trasl:pendiente": { label: "Pendiente", tone: "default" },
   "trasl:en-transito": { label: "En tránsito", tone: "accent" },

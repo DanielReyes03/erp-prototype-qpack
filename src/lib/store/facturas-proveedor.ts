@@ -9,7 +9,12 @@ import {
 } from "@/lib/seed/facturas-proveedor";
 import { useOrdenesCompraStore } from "@/lib/store/ordenes-compra";
 import { useCxpStore } from "@/lib/store/cxp";
+import { useContabilidadStore } from "@/lib/store/contabilidad";
 import { PROVEEDORES_SEED } from "@/lib/seed/proveedores";
+
+function round2(n: number): number {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
+}
 
 export interface FacturaProveedorInput {
   proveedorId: string;
@@ -65,6 +70,19 @@ export const useFacturasProveedorStore = create<FacturasProveedorState>()(
           moneda: input.moneda,
         });
 
+        const base = round2(input.monto / 1.12);
+        const iva = round2(input.monto - base);
+        useContabilidadStore.getState().registrarPoliza({
+          tipo: "compra",
+          concepto: `Compra según factura ${input.numeroFactura}`,
+          origen: factura.id,
+          lineas: [
+            { cuentaCodigo: "1.1.06", descripcion: "Inventario de Mercadería", debe: base, haber: 0 },
+            { cuentaCodigo: "1.1.07", descripcion: "IVA Crédito Fiscal", debe: iva, haber: 0 },
+            { cuentaCodigo: "2.1.01", descripcion: "Proveedores Locales", debe: 0, haber: input.monto },
+          ],
+        });
+
         return factura;
       },
 
@@ -85,6 +103,6 @@ export const useFacturasProveedorStore = create<FacturasProveedorState>()(
         return nota;
       },
     }),
-    { name: "qpack-facturas-proveedor" },
+    { name: "qpack-facturas-proveedor", skipHydration: true },
   ),
 );

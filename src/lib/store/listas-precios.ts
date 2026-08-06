@@ -71,6 +71,6 @@ export const useListasPreciosStore = create<ListasPreciosState>()(
         );
       },
     }),
-    { name: "qpack-listas-precios" },
+    { name: "qpack-listas-precios", skipHydration: true },
   ),
 );

@@ -20,6 +20,6 @@ export const useUiStore = create<UiState>()(
       activeCompanyId: "qpack-gt",
       setActiveCompanyId: (id) => set({ activeCompanyId: id }),
     }),
-    { name: "qpack-ui" },
+    { name: "qpack-ui", skipHydration: true },
   ),
 );

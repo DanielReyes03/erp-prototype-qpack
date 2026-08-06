@@ -149,6 +149,6 @@ export const useOrdenesVentaStore = create<OrdenesVentaState>()(
         });
       },
     }),
-    { name: "qpack-ordenes-venta" },
+    { name: "qpack-ordenes-venta", skipHydration: true },
   ),
 );

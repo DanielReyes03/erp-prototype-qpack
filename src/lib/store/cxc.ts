@@ -8,6 +8,7 @@ import {
   type PagoCliente,
   type AplicacionPagoCliente,
 } from "@/lib/seed/cxc";
+import { useContabilidadStore } from "@/lib/store/contabilidad";
 
 const HOY = new Date(2026, 7, 5);
 
@@ -86,9 +87,21 @@ export const useCxcStore = create<CxcState>()(
         });
 
         set({ documentos, pagos: [pago, ...get().pagos] });
+
+        const cuentaDestino = input.metodoPago === "Efectivo" ? "1.1.01" : "1.1.02";
+        useContabilidadStore.getState().registrarPoliza({
+          tipo: "cobro",
+          concepto: `Cobro a cliente — ${input.metodoPago}`,
+          origen: pago.id,
+          lineas: [
+            { cuentaCodigo: cuentaDestino, descripcion: "Caja / Bancos", debe: montoTotal, haber: 0 },
+            { cuentaCodigo: "1.1.04", descripcion: "Clientes Nacionales", debe: 0, haber: montoTotal },
+          ],
+        });
+
         return pago;
       },
     }),
-    { name: "qpack-cxc" },
+    { name: "qpack-cxc", skipHydration: true },
   ),
 );

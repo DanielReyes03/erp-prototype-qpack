@@ -7,6 +7,7 @@ import { ChevronsLeft, ChevronsRight, ChevronDown, Boxes } from "lucide-react";
 import { cn, Tooltip, Button } from "@heroui/react";
 import { NAV_GROUPS } from "@/lib/nav";
 import { useUiStore } from "@/lib/store/ui";
+import { usePermisosActuales } from "@/lib/store/seguridad";
 
 function groupContainsPath(group: (typeof NAV_GROUPS)[number], pathname: string): boolean {
   return group.items.some((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
@@ -16,8 +17,10 @@ export function Sidebar() {
   const isCollapsed = useUiStore((s) => s.isSidebarCollapsed);
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const pathname = usePathname();
+  const permisos = usePermisosActuales();
 
-  const activeGroup = NAV_GROUPS.find((g) => groupContainsPath(g, pathname));
+  const visibleGroups = NAV_GROUPS.filter((g) => g.moduloKey === null || permisos[g.moduloKey]);
+  const activeGroup = visibleGroups.find((g) => groupContainsPath(g, pathname));
   const [expanded, setExpanded] = useState<string | null>(activeGroup?.label ?? null);
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export function Sidebar() {
           </p>
         )}
         <ul className="flex flex-col gap-0.5 px-2">
-          {NAV_GROUPS.map((group) => {
+          {visibleGroups.map((group) => {
             const isSingle = group.items.length === 1;
             const GroupIcon = group.icon;
             const isGroupActive = groupContainsPath(group, pathname);

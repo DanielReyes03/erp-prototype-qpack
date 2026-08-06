@@ -60,6 +60,6 @@ export const useClientesStore = create<ClientesState>()(
         });
       },
     }),
-    { name: "qpack-clientes" },
+    { name: "qpack-clientes", skipHydration: true },
   ),
 );

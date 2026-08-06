@@ -289,6 +289,6 @@ export const useInventarioStore = create<InventarioState>()(
         });
       },
     }),
-    { name: "qpack-inventario" },
+    { name: "qpack-inventario", skipHydration: true },
   ),
 );

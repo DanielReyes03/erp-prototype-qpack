@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Kanban,
 } from "lucide-react";
+import type { ModuloKey } from "@/lib/seed/roles";
 
 export interface NavItem {
   label: string;
@@ -24,6 +25,8 @@ export interface NavGroup {
   label: string;
   icon: LucideIcon;
   items: NavItem[];
+  /** Clave de módulo usada para filtrar por permisos del rol activo. `null` = siempre visible. */
+  moduloKey: ModuloKey | null;
 }
 
 /**
@@ -36,6 +39,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "General",
     icon: LayoutDashboard,
     items: [{ label: "Dashboard", href: "/dashboard", icon: LayoutDashboard }],
+    moduloKey: null,
   },
   {
     label: "Datos maestros",
@@ -48,6 +52,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Listas de precios", href: "/maestros/listas-precios" },
       { label: "Geografía", href: "/maestros/geografia" },
     ],
+    moduloKey: "maestros",
   },
   {
     label: "Inventario",
@@ -58,6 +63,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Kardex", href: "/inventario/kardex" },
       { label: "Traslados", href: "/inventario/traslados" },
     ],
+    moduloKey: "inventario",
   },
   {
     label: "Ventas",
@@ -67,6 +73,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Cotizaciones", href: "/ventas/cotizaciones" },
       { label: "Despachos y rutas", href: "/ventas/despachos" },
     ],
+    moduloKey: "ventas",
   },
   {
     label: "Compras",
@@ -76,6 +83,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Recepciones", href: "/compras/recepciones" },
       { label: "Facturas de proveedor", href: "/compras/facturas" },
     ],
+    moduloKey: "compras",
   },
   {
     label: "CRM",
@@ -85,11 +93,13 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Actividades", href: "/crm/actividades" },
       { label: "Reclamos", href: "/crm/reclamos" },
     ],
+    moduloKey: "crm",
   },
   {
     label: "Facturación (DTE)",
     icon: FileText,
     items: [{ label: "Documentos DTE", href: "/dte" }],
+    moduloKey: "dte",
   },
   {
     label: "Tesorería",
@@ -99,6 +109,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Movimientos", href: "/tesoreria/movimientos" },
       { label: "Cajas chicas", href: "/tesoreria/cajas-chicas" },
     ],
+    moduloKey: "tesoreria",
   },
   {
     label: "CxC / CxP",
@@ -108,6 +119,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Cuentas por pagar", href: "/cxp" },
       { label: "Comisiones", href: "/cxc/comisiones" },
     ],
+    moduloKey: "cxcCxp",
   },
   {
     label: "Contabilidad",
@@ -121,11 +133,13 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Libro de ventas", href: "/contabilidad/libro-ventas" },
       { label: "Libro de compras", href: "/contabilidad/libro-compras" },
     ],
+    moduloKey: "contabilidad",
   },
   {
     label: "Reportería",
     icon: BarChart3,
     items: [{ label: "Reportes", href: "/reportes" }],
+    moduloKey: "reporteria",
   },
   {
     label: "Seguridad",
@@ -134,5 +148,6 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Usuarios", href: "/seguridad/usuarios" },
       { label: "Roles y permisos", href: "/seguridad/roles" },
     ],
+    moduloKey: "seguridad",
   },
 ];

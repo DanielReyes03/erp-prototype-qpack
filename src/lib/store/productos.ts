@@ -49,6 +49,6 @@ export const useProductosStore = create<ProductosState>()(
         set({ productos: get().productos.map((p) => (p.id === id ? { ...p, activo } : p)) });
       },
     }),
-    { name: "qpack-productos" },
+    { name: "qpack-productos", skipHydration: true },
   ),
 );

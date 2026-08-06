@@ -127,3 +127,17 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Modales un poco más grandes que el ancho por defecto de HeroUI en cada size */
+.modal__dialog--xs {
+  max-width: var(--container-sm);
+}
+.modal__dialog--sm {
+  max-width: var(--container-md);
+}
+.modal__dialog--md {
+  max-width: var(--container-lg);
+}
+.modal__dialog--lg {
+  max-width: var(--container-xl);
+}

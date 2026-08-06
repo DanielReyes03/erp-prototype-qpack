@@ -12,6 +12,7 @@ import {
   type CajaChica,
   type MovimientoCajaChica,
 } from "@/lib/seed/tesoreria";
+import { useContabilidadStore } from "@/lib/store/contabilidad";
 
 function round2(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
@@ -165,6 +166,16 @@ export const useTesoreriaStore = create<TesoreriaState>()(
           cajas: get().cajas.map((c) => (c.id === input.cajaId ? { ...c, saldoActual: nuevoSaldo } : c)),
           movimientosCaja: [movimiento, ...get().movimientosCaja],
         });
+
+        useContabilidadStore.getState().registrarPoliza({
+          tipo: "gasto",
+          concepto: `Gasto de caja chica — ${input.concepto}`,
+          origen: input.cajaId,
+          lineas: [
+            { cuentaCodigo: "6.2.04", descripcion: "Gastos de Caja Chica", debe: input.monto, haber: 0 },
+            { cuentaCodigo: "1.1.01", descripcion: "Caja General", debe: 0, haber: input.monto },
+          ],
+        });
       },
 
       async reponerCaja(cajaId, monto) {
@@ -189,6 +200,6 @@ export const useTesoreriaStore = create<TesoreriaState>()(
         });
       },
     }),
-    { name: "qpack-tesoreria" },
+    { name: "qpack-tesoreria", skipHydration: true },
   ),
 );

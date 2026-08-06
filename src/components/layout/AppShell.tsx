@@ -6,12 +6,14 @@ import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { CommandPalette } from "./CommandPalette";
 import { ToastRegion } from "./ToastRegion";
+import { StoreHydrator } from "./StoreHydrator";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const isCollapsed = useUiStore((s) => s.isSidebarCollapsed);
 
   return (
     <div className="min-h-screen bg-background">
+      <StoreHydrator />
       <Sidebar />
       <Topbar />
       <main

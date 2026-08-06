@@ -12,8 +12,12 @@ import {
   FieldError,
   Input,
   Switch,
+  DateField,
+  Calendar,
+  DatePicker,
 } from "@heroui/react";
 import { cn } from "@/lib/cn";
+import { toDateValue, fromDateValue } from "@/lib/date-value";
 
 interface BaseProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
@@ -236,6 +240,61 @@ export function FormSwitch<TFieldValues extends FieldValues>({
             </div>
           </Switch.Content>
         </Switch>
+      )}
+    />
+  );
+}
+
+export function FormDatePicker<TFieldValues extends FieldValues>({
+  control,
+  name,
+  label,
+  description,
+  isRequired,
+  isDisabled,
+  className,
+}: BaseProps<TFieldValues>) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <DatePicker
+          className={cn("flex flex-col gap-1", className)}
+          value={toDateValue(field.value as string)}
+          onChange={(v) => field.onChange(fromDateValue(v) ? new Date(fromDateValue(v)!).toISOString() : null)}
+          isRequired={isRequired}
+          isDisabled={isDisabled}
+          isInvalid={!!fieldState.error}
+        >
+          <Label>{label}</Label>
+          <DateField.Group fullWidth>
+            <DateField.Input>{(segment) => <DateField.Segment segment={segment} />}</DateField.Input>
+            <DateField.Suffix>
+              <DatePicker.Trigger>
+                <DatePicker.TriggerIndicator />
+              </DatePicker.Trigger>
+            </DateField.Suffix>
+          </DateField.Group>
+          <DatePicker.Popover>
+            <Calendar aria-label={label}>
+              <Calendar.Header>
+                <Calendar.YearPickerTrigger>
+                  <Calendar.YearPickerTriggerHeading />
+                  <Calendar.YearPickerTriggerIndicator />
+                </Calendar.YearPickerTrigger>
+                <Calendar.NavButton slot="previous" />
+                <Calendar.NavButton slot="next" />
+              </Calendar.Header>
+              <Calendar.Grid>
+                <Calendar.GridHeader>{(day) => <Calendar.HeaderCell>{day}</Calendar.HeaderCell>}</Calendar.GridHeader>
+                <Calendar.GridBody>{(date) => <Calendar.Cell date={date} />}</Calendar.GridBody>
+              </Calendar.Grid>
+            </Calendar>
+          </DatePicker.Popover>
+          {description ? <Description>{description}</Description> : null}
+          <FieldError>{fieldState.error?.message}</FieldError>
+        </DatePicker>
       )}
     />
   );

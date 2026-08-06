@@ -44,6 +44,6 @@ export const useProveedoresStore = create<ProveedoresState>()(
         set({ proveedores: get().proveedores.map((p) => (p.id === id ? { ...p, activo } : p)) });
       },
     }),
-    { name: "qpack-proveedores" },
+    { name: "qpack-proveedores", skipHydration: true },
   ),
 );

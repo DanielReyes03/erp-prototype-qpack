@@ -8,6 +8,7 @@ import {
   type PagoProveedor,
   type AplicacionPagoProveedor,
 } from "@/lib/seed/cxp";
+import { useContabilidadStore } from "@/lib/store/contabilidad";
 
 function round2(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
@@ -58,9 +59,20 @@ export const useCxpStore = create<CxpState>()(
         });
 
         set({ documentos, pagos: [pago, ...get().pagos] });
+
+        useContabilidadStore.getState().registrarPoliza({
+          tipo: "pago",
+          concepto: `Pago a proveedor — ${input.metodoPago}`,
+          origen: pago.id,
+          lineas: [
+            { cuentaCodigo: "2.1.01", descripcion: "Proveedores Locales", debe: montoTotal, haber: 0 },
+            { cuentaCodigo: "1.1.02", descripcion: "Bancos Quetzales", debe: 0, haber: montoTotal },
+          ],
+        });
+
         return pago;
       },
     }),
-    { name: "qpack-cxp" },
+    { name: "qpack-cxp", skipHydration: true },
   ),
 );
