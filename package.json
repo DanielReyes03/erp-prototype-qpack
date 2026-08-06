@@ -1,0 +1,38 @@
+{
+  "name": "qpack-erp-prototipo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@heroui/react": "^3.2.3",
+    "@heroui/styles": "^3.2.3",
+    "@hookform/resolvers": "^5.7.1",
+    "@internationalized/date": "^3.12.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.28.0",
+    "next": "15.5.22",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-hook-form": "^7.84.0",
+    "tailwind-variants": "^3.3.1",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.22",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
