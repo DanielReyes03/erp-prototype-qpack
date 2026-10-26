@@ -5,6 +5,7 @@ export interface FacturaProveedor {
   proveedorId: string;
   ordenCompraId?: string;
   fecha: string;
+  serie: string;
   numeroFactura: string;
   monto: number;
   moneda: "GTQ" | "USD";
@@ -32,7 +33,8 @@ export const FACTURAS_PROVEEDOR_SEED: FacturaProveedor[] = ordenesFacturadas.map
   proveedorId: orden.proveedorId,
   ordenCompraId: orden.id,
   fecha: orden.fechaFacturacion ?? orden.fecha,
-  numeroFactura: `SAT-${String(9000 + i * 7)}`,
+  serie: i % 3 === 0 ? "B" : "A",
+  numeroFactura: String(9000 + i * 7),
   monto: Math.round(totalOrden(orden) * 100) / 100,
   moneda: orden.moneda,
   createdAt: orden.fechaFacturacion ?? orden.fecha,

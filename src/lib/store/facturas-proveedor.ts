@@ -19,6 +19,7 @@ function round2(n: number): number {
 export interface FacturaProveedorInput {
   proveedorId: string;
   ordenCompraId?: string;
+  serie: string;
   numeroFactura: string;
   monto: number;
   moneda: "GTQ" | "USD";
@@ -74,7 +75,7 @@ export const useFacturasProveedorStore = create<FacturasProveedorState>()(
         const iva = round2(input.monto - base);
         useContabilidadStore.getState().registrarPoliza({
           tipo: "compra",
-          concepto: `Compra según factura ${input.numeroFactura}`,
+          concepto: `Compra según factura ${input.serie}-${input.numeroFactura}`,
           origen: factura.id,
           lineas: [
             { cuentaCodigo: "1.1.06", descripcion: "Inventario de Mercadería", debe: base, haber: 0 },

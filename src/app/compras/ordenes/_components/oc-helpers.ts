@@ -2,12 +2,16 @@ import type { DocumentStep } from "@/components/patterns/DocumentStepper";
 import type { OrdenCompra } from "@/lib/seed/ordenes-compra";
 import { PROVEEDORES_SEED } from "@/lib/seed/proveedores";
 import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 
 export function proveedorDe(id: string) {
   return PROVEEDORES_SEED.find((p) => p.id === id);
 }
 export function locacionDe(id: string) {
-  return LOCACIONES_SEED.find((l) => l.id === id);
+  return (
+    useLocacionesStore.getState().locaciones.find((l) => l.id === id) ??
+    LOCACIONES_SEED.find((l) => l.id === id)
+  );
 }
 
 export function ocStepperProps(orden: OrdenCompra): {

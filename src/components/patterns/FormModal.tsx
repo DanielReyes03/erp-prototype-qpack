@@ -13,6 +13,8 @@ interface FormModalProps<TFieldValues extends FieldValues> {
   title: string;
   description?: string;
   size?: ModalSize;
+  /** Clases extra para el `<Modal.Dialog>` (ej. `sm:max-w-3xl!` para ensanchar). */
+  dialogClassName?: string;
   form: UseFormReturn<TFieldValues>;
   onSubmit: (values: TFieldValues) => Promise<void> | void;
   children: React.ReactNode;
@@ -30,6 +32,7 @@ export function FormModal<TFieldValues extends FieldValues>({
   title,
   description,
   size = "md",
+  dialogClassName,
   form,
   onSubmit,
   children,
@@ -64,7 +67,7 @@ export function FormModal<TFieldValues extends FieldValues>({
     <>
       <Modal.Backdrop isOpen={isOpen} onOpenChange={requestClose}>
         <Modal.Container size={size}>
-          <Modal.Dialog aria-label={title}>
+          <Modal.Dialog aria-label={title} className={dialogClassName}>
             <Modal.CloseTrigger />
             <Modal.Header>
               <Modal.Heading>{title}</Modal.Heading>

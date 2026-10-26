@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
-import { Button } from "@heroui/react";
+import { Plus, Eye, Printer, Mail } from "lucide-react";
+import { Button, toast } from "@heroui/react";
 import { PageHeader } from "@/components/patterns/PageHeader";
 import { FilterBar } from "@/components/patterns/FilterBar";
 import { DataTable, type DataTableColumn } from "@/components/patterns/DataTable";
@@ -106,6 +106,29 @@ export default function OrdenesCompraPage() {
         emptyTitle="Sin órdenes de compra"
         emptyDescription="No se encontraron órdenes con los filtros actuales."
         onRowClick={(o) => router.push(`/compras/ordenes/${o.id}`)}
+        rowActions={[
+          {
+            key: "abrir",
+            label: "Abrir detalle",
+            icon: Eye,
+            onSelect: (o) => router.push(`/compras/ordenes/${o.id}`),
+          },
+          {
+            key: "imprimir",
+            label: "Imprimir",
+            icon: Printer,
+            onSelect: (o) => toast.success("Enviada a impresión", { description: o.id }),
+          },
+          {
+            key: "correo",
+            label: "Enviar por correo",
+            icon: Mail,
+            onSelect: (o) =>
+              toast.success("Orden enviada por correo", {
+                description: `${o.id} · ${proveedorDe(o.proveedorId)?.nombreComercial ?? ""}`.trim(),
+              }),
+          },
+        ]}
       />
     </div>
   );

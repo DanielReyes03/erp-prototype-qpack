@@ -1,3 +1,5 @@
+import { PROVEEDORES_SEED } from "./proveedores";
+
 export interface Producto {
   id: string;
   sku: string;
@@ -8,6 +10,9 @@ export interface Producto {
   precioBase: number;
   existenciaTotal: number;
   puntoReorden: number;
+  stockMinimo: number;
+  stockMaximo: number;
+  proveedorId: string;
   activo: boolean;
   createdAt: string;
 }
@@ -112,6 +117,10 @@ const FILM: ProductoSeedInput[] = [
 
 const ALL: ProductoSeedInput[] = [...RESINAS, ...BOLSAS, ...ENVASES, ...TAPAS, ...ADITIVOS, ...FILM];
 
+const PROVEEDORES_PRODUCTO = PROVEEDORES_SEED.filter(
+  (p) => p.activo && p.nombreComercial !== "Caja chica 1",
+);
+
 export const PRODUCTOS_SEED: Producto[] = ALL.map((raw, i) => ({
   id: `prod-${String(i + 1).padStart(3, "0")}`,
   sku: raw.sku,
@@ -122,6 +131,9 @@ export const PRODUCTOS_SEED: Producto[] = ALL.map((raw, i) => ({
   precioBase: Math.round(raw.costo * raw.margen * 100) / 100,
   existenciaTotal: raw.existenciaTotal,
   puntoReorden: raw.puntoReorden,
+  stockMinimo: raw.puntoReorden,
+  stockMaximo: raw.puntoReorden * 3,
+  proveedorId: PROVEEDORES_PRODUCTO[i % PROVEEDORES_PRODUCTO.length].id,
   activo: true,
   createdAt: new Date(2023, (i * 4) % 12, ((i * 9) % 27) + 1).toISOString(),
 }));

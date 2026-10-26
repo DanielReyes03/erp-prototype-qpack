@@ -13,6 +13,7 @@ import { cn } from "@/lib/cn";
 import { useProductosStore } from "@/lib/store/productos";
 import { useInventarioStore } from "@/lib/store/inventario";
 import { CATEGORIAS_PRODUCTO, type Producto } from "@/lib/seed/productos";
+import { PROVEEDORES_SEED } from "@/lib/seed/proveedores";
 import { ProductoFormModal } from "./_components/ProductoFormModal";
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -88,6 +89,11 @@ export default function ProductosPage() {
     { key: "categoria", header: "Categoría", sortAccessor: (p) => p.categoria, cell: (p) => p.categoria },
     { key: "um", header: "Unidad", cell: (p) => p.unidadMedida },
     {
+      key: "proveedor",
+      header: "Proveedor",
+      cell: (p) => PROVEEDORES_SEED.find((pr) => pr.id === p.proveedorId)?.nombreComercial ?? "—",
+    },
+    {
       key: "costo",
       header: "Costo",
       align: "right",
@@ -115,6 +121,17 @@ export default function ProductosPage() {
           </div>
         );
       },
+    },
+    {
+      key: "stock",
+      header: "Stock mín / máx",
+      align: "right",
+      sortAccessor: (p) => p.stockMinimo,
+      cell: (p) => (
+        <span className="font-data text-slate-500">
+          {p.stockMinimo.toLocaleString("en-US")} / {p.stockMaximo.toLocaleString("en-US")}
+        </span>
+      ),
     },
     {
       key: "reorden",

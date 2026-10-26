@@ -10,6 +10,7 @@ interface LocacionesState {
   createLocacion: (input: LocacionInput) => Promise<Locacion>;
   updateLocacion: (id: string, input: LocacionInput) => Promise<Locacion>;
   deleteLocacion: (id: string) => Promise<void>;
+  setActivo: (id: string, activo: boolean) => Promise<void>;
 }
 
 export const useLocacionesStore = create<LocacionesState>()(
@@ -34,6 +35,11 @@ export const useLocacionesStore = create<LocacionesState>()(
       async deleteLocacion(id) {
         await sleep();
         set({ locaciones: get().locaciones.filter((l) => l.id !== id) });
+      },
+
+      async setActivo(id, activo) {
+        await sleep();
+        set({ locaciones: get().locaciones.map((l) => (l.id === id ? { ...l, activo } : l)) });
       },
     }),
     { name: "qpack-locaciones", skipHydration: true },

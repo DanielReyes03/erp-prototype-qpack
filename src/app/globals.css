@@ -105,9 +105,10 @@ body {
   color: var(--color-foreground);
 }
 
-/* Columnas de dinero, cantidades, SKU y folios: tipografía monoespaciada tabular */
+/* Columnas de dinero, cantidades, SKU y folios: misma tipografía que el texto,
+   con dígitos tabulares para mantener la alineación en columnas numéricas */
 .font-data {
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-family: inherit;
   font-variant-numeric: tabular-nums;
 }
 

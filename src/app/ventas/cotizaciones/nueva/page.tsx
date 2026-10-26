@@ -72,7 +72,7 @@ export default function NuevaCotizacionPage() {
 
       <PageHeader
         title="Nueva cotización"
-        description="Se guarda como borrador; luego podés enviarla al cliente."
+        description="Se guarda como borrador; luego puedes enviarla al cliente."
         actions={
           <Button isPending={isSaving} isDisabled={!canSave} onPress={handleSave}>
             Guardar borrador
@@ -157,7 +157,7 @@ export default function NuevaCotizacionPage() {
 
       {!cliente ? (
         <p className="mb-4 text-sm text-slate-500">
-          Seleccioná un cliente para habilitar el detalle de productos.
+          Selecciona un cliente para habilitar el detalle de productos.
         </p>
       ) : (
         <LineItemsEditor items={lineas} onChange={setLineas} products={products} currency="GTQ" />

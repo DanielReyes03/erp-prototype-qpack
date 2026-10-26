@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const actividadSchema = z.object({
-  tipo: z.enum(["llamada", "reunion", "tarea", "email"], { error: "Seleccioná un tipo" }),
+  tipo: z.enum(["llamada", "reunion", "tarea", "email"], { error: "Selecciona un tipo" }),
   asunto: z.string().min(3, "Requerido"),
-  clienteId: z.string().min(1, "Seleccioná un cliente"),
+  clienteId: z.string().min(1, "Selecciona un cliente"),
   oportunidadId: z.string().optional(),
-  vendedorId: z.string().min(1, "Seleccioná un vendedor"),
+  vendedorId: z.string().min(1, "Selecciona un vendedor"),
   fecha: z.string().min(1, "Requerido"),
   notas: z.string().optional(),
 });

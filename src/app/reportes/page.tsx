@@ -12,11 +12,11 @@ import { computeTotals } from "@/components/patterns/LineItemsEditor";
 import { useDteStore } from "@/lib/store/dte";
 import { useFacturasProveedorStore } from "@/lib/store/facturas-proveedor";
 import { useInventarioStore } from "@/lib/store/inventario";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { CLIENTES_SEED } from "@/lib/seed/clientes";
 import { VENDEDORES_SEED } from "@/lib/seed/vendedores";
 import { PROVEEDORES_SEED } from "@/lib/seed/proveedores";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
 
 function periodoDe(fecha: string) {
   const d = new Date(fecha);
@@ -67,6 +67,7 @@ export default function ReportesPage() {
   const documentos = useDteStore((s) => s.documentos);
   const facturasProveedor = useFacturasProveedorStore((s) => s.facturas);
   const existencias = useInventarioStore((s) => s.existencias);
+  const locaciones = useLocacionesStore((s) => s.locaciones);
 
   const ventasCertificadas = useMemo(
     () => documentos.filter((d) => d.tipo === "FACT" && d.estado === "certificado"),
@@ -148,7 +149,7 @@ export default function ReportesPage() {
       .filter((e) => e.cantidad > 0)
       .map((e) => {
         const producto = PRODUCTOS_SEED.find((p) => p.id === e.productoId);
-        const locacion = LOCACIONES_SEED.find((l) => l.id === e.locacionId);
+        const locacion = locaciones.find((l) => l.id === e.locacionId);
         return {
           productoId: e.productoId,
           locacionId: e.locacionId,
@@ -161,7 +162,7 @@ export default function ReportesPage() {
         };
       })
       .sort((a, b) => b.valor - a.valor);
-  }, [existencias]);
+  }, [existencias, locaciones]);
 
   const totalVentas = ventasCertificadas.reduce((s, d) => s + computeTotals(d.lineas).total, 0);
   const totalCompras = facturasProveedor.reduce((s, f) => s + f.monto, 0);

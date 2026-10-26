@@ -87,6 +87,7 @@ export function ClienteFormModal({ isOpen, onOpenChange, cliente }: ClienteFormM
       title={isEditing ? "Editar cliente" : "Nuevo cliente"}
       description="Los campos marcados con * son obligatorios."
       size="lg"
+      dialogClassName="sm:max-w-3xl!"
       form={form}
       onSubmit={handleSubmit}
       submitLabel={isEditing ? "Guardar cambios" : "Crear cliente"}
@@ -132,7 +133,7 @@ export function ClienteFormModal({ isOpen, onOpenChange, cliente }: ClienteFormM
               label="Municipio"
               isRequired
               options={municipioOptions}
-              placeholder={departamentoId ? "Seleccionar…" : "Elegí un departamento primero"}
+              placeholder={departamentoId ? "Seleccionar…" : "Elige un departamento primero"}
             />
             <FormTextField control={form.control} name="zona" label="Zona" placeholder="Zona 10" isRequired />
           </div>

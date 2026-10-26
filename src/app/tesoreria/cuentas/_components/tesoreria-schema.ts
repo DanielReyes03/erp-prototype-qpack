@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const movimientoSchema = z.object({
-  cuentaId: z.string().min(1, "Seleccioná una cuenta"),
+  cuentaId: z.string().min(1, "Selecciona una cuenta"),
   tipo: z.enum(["deposito", "cheque"]),
   monto: z.number({ error: "Requerido" }).positive("Debe ser mayor a 0"),
   descripcion: z.string().min(3, "Requerido"),
@@ -18,8 +18,8 @@ export const EMPTY_MOVIMIENTO_FORM: MovimientoFormValues = {
 
 export const transferenciaSchema = z
   .object({
-    cuentaOrigenId: z.string().min(1, "Seleccioná la cuenta de origen"),
-    cuentaDestinoId: z.string().min(1, "Seleccioná la cuenta de destino"),
+    cuentaOrigenId: z.string().min(1, "Selecciona la cuenta de origen"),
+    cuentaDestinoId: z.string().min(1, "Selecciona la cuenta de destino"),
     monto: z.number({ error: "Requerido" }).positive("Debe ser mayor a 0"),
     descripcion: z.string().min(3, "Requerido"),
   })

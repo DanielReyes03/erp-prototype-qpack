@@ -1,5 +1,6 @@
 import { PRODUCTOS_SEED } from "./productos";
 import { LOCACIONES_SEED } from "./locaciones";
+import { ORDENES_VENTA_SEED } from "./ordenes-venta";
 
 export type TipoMovimiento =
   | "entrada"
@@ -29,6 +30,8 @@ export interface ExistenciaLocacion {
   locacionId: string;
   cantidad: number;
   costoPromedio: number;
+  /** Unidades comprometidas por pedidos en estado "recibido" (aún sin descargar). */
+  reservado: number;
 }
 
 const BODEGA_PRINCIPAL = "loc-central";
@@ -241,9 +244,32 @@ movimientos.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTi
 
 export const KARDEX_MOVIMIENTOS_SEED: MovimientoInventario[] = movimientos;
 
-export const EXISTENCIAS_SEED: ExistenciaLocacion[] = Array.from(state.entries())
-  .filter(([, v]) => v.cantidad > 0)
-  .map(([k, v]) => {
-    const [productoId, locacionId] = k.split("::");
-    return { productoId, locacionId, cantidad: v.cantidad, costoPromedio: v.costoPromedio };
-  });
+// Reservas iniciales: unidades comprometidas por las órdenes de venta semilla que
+// están en estado "recibido" (aún no facturadas, por lo tanto reservadas).
+const reservasSeed = new Map<string, number>();
+for (const orden of ORDENES_VENTA_SEED) {
+  if (orden.estado !== "recibido") continue;
+  for (const linea of orden.lineas) {
+    const k = key(linea.productoId, orden.locacionId);
+    reservasSeed.set(k, (reservasSeed.get(k) ?? 0) + linea.cantidad);
+  }
+}
+
+const existenciaKeys = new Set(
+  Array.from(state.entries())
+    .filter(([, v]) => v.cantidad > 0)
+    .map(([k]) => k),
+);
+for (const k of reservasSeed.keys()) existenciaKeys.add(k);
+
+export const EXISTENCIAS_SEED: ExistenciaLocacion[] = Array.from(existenciaKeys).map((k) => {
+  const [productoId, locacionId] = k.split("::");
+  const v = getState(productoId, locacionId);
+  return {
+    productoId,
+    locacionId,
+    cantidad: v.cantidad,
+    costoPromedio: v.costoPromedio,
+    reservado: round2(reservasSeed.get(k) ?? 0),
+  };
+});

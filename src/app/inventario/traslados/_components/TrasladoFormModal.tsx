@@ -7,8 +7,8 @@ import { toast } from "@heroui/react";
 import { FormModal } from "@/components/patterns/FormModal";
 import { FormSelect, FormNumberField, FormTextField } from "@/components/patterns/form-fields";
 import { useInventarioStore } from "@/lib/store/inventario";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
 import { trasladoSchema, EMPTY_TRASLADO_FORM, type TrasladoFormValues } from "./traslado-schema";
 
 interface TrasladoFormModalProps {
@@ -19,6 +19,7 @@ interface TrasladoFormModalProps {
 export function TrasladoFormModal({ isOpen, onOpenChange }: TrasladoFormModalProps) {
   const registrarTraslado = useInventarioStore((s) => s.registrarTraslado);
   const getExistencia = useInventarioStore((s) => s.getExistencia);
+  const locacionesActivas = useLocacionesStore((s) => s.locaciones).filter((l) => l.activo);
 
   const form = useForm<TrasladoFormValues>({
     resolver: zodResolver(trasladoSchema),
@@ -51,7 +52,7 @@ export function TrasladoFormModal({ isOpen, onOpenChange }: TrasladoFormModalPro
     <FormModal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      title="Nuevo traslado entre locaciones"
+      title="Nuevo traslado entre almacenes"
       size="sm"
       form={form}
       onSubmit={handleSubmit}
@@ -68,9 +69,9 @@ export function TrasladoFormModal({ isOpen, onOpenChange }: TrasladoFormModalPro
         <FormSelect
           control={form.control}
           name="locacionOrigenId"
-          label="Locación de origen"
+          label="Almacén de origen"
           isRequired
-          options={LOCACIONES_SEED.map((l) => ({ id: l.id, label: l.nombre }))}
+          options={locacionesActivas.map((l) => ({ id: l.id, label: l.nombre }))}
           description={
             productoId && locacionOrigenId
               ? `Disponible: ${existenciaOrigen.toLocaleString("en-US")}`
@@ -80,9 +81,9 @@ export function TrasladoFormModal({ isOpen, onOpenChange }: TrasladoFormModalPro
         <FormSelect
           control={form.control}
           name="locacionDestinoId"
-          label="Locación de destino"
+          label="Almacén de destino"
           isRequired
-          options={LOCACIONES_SEED.map((l) => ({ id: l.id, label: l.nombre }))}
+          options={locacionesActivas.map((l) => ({ id: l.id, label: l.nombre }))}
         />
       </div>
       <FormNumberField control={form.control} name="cantidad" label="Cantidad" minValue={0} isRequired />

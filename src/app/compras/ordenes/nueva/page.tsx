@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button, Select, ListBox, Label, toast } from "@heroui/react";
@@ -8,18 +8,23 @@ import Link from "next/link";
 import { PageHeader } from "@/components/patterns/PageHeader";
 import { LineItemsEditor, type LineItem, type LineItemProduct } from "@/components/patterns/LineItemsEditor";
 import { useOrdenesCompraStore } from "@/lib/store/ordenes-compra";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { PROVEEDORES_SEED } from "@/lib/seed/proveedores";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
 
 export default function NuevaOrdenCompraPage() {
   const router = useRouter();
   const crearOrden = useOrdenesCompraStore((s) => s.crearOrden);
+  const locacionesActivas = useLocacionesStore((s) => s.locaciones).filter((l) => l.activo);
 
   const [proveedorId, setProveedorId] = useState<string | null>(null);
-  const [locacionId, setLocacionId] = useState<string | null>(LOCACIONES_SEED[0].id);
+  const [locacionId, setLocacionId] = useState<string | null>(null);
   const [lineas, setLineas] = useState<LineItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!locacionId && locacionesActivas.length > 0) setLocacionId(locacionesActivas[0].id);
+  }, [locacionId, locacionesActivas]);
 
   const proveedor = PROVEEDORES_SEED.find((p) => p.id === proveedorId);
 
@@ -72,7 +77,7 @@ export default function NuevaOrdenCompraPage() {
 
       <PageHeader
         title="Nueva orden de compra"
-        description="Se guarda como borrador; luego podés confirmarla y registrar la recepción."
+        description="Se guarda como borrador; luego puedes confirmarla y registrar la recepción."
         actions={
           <Button isPending={isSaving} isDisabled={!canSave} onPress={handleSave}>
             Guardar borrador
@@ -117,7 +122,7 @@ export default function NuevaOrdenCompraPage() {
           </Select.Trigger>
           <Select.Popover>
             <ListBox>
-              {LOCACIONES_SEED.map((l) => (
+              {locacionesActivas.map((l) => (
                 <ListBox.Item key={l.id} id={l.id} textValue={l.nombre}>
                   {l.nombre}
                   <ListBox.ItemIndicator />
@@ -130,7 +135,7 @@ export default function NuevaOrdenCompraPage() {
 
       {!proveedor ? (
         <p className="mb-4 text-sm text-slate-500">
-          Seleccioná un proveedor para habilitar el detalle de productos.
+          Selecciona un proveedor para habilitar el detalle de productos.
         </p>
       ) : (
         <LineItemsEditor items={lineas} onChange={setLineas} products={products} currency="GTQ" />

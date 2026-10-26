@@ -25,7 +25,7 @@ export function RecepcionModal({ isOpen, onOpenChange, orden }: RecepcionModalPr
       .filter((r) => r.cantidad > 0);
 
     if (recepciones.length === 0) {
-      toast.danger("Ingresá al menos una cantidad a recibir");
+      toast.danger("Ingresa al menos una cantidad a recibir");
       return;
     }
 
@@ -48,7 +48,7 @@ export function RecepcionModal({ isOpen, onOpenChange, orden }: RecepcionModalPr
           <Modal.Header>
             <Modal.Heading>Registrar recepción — {orden.id}</Modal.Heading>
             <p className="text-sm text-slate-500">
-              Indicá la cantidad recibida por línea. Podés recibir parcialmente.
+              Indica la cantidad recibida por línea. Puedes recibir parcialmente.
             </p>
           </Modal.Header>
           <Modal.Body className="flex flex-col gap-3">

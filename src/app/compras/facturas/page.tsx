@@ -33,7 +33,11 @@ export default function FacturasProveedorPage() {
       key: "id",
       header: "Factura",
       cellClassName: "whitespace-nowrap",
-      cell: (f) => <span className="font-data font-medium text-blue-700">{f.numeroFactura}</span>,
+      cell: (f) => (
+        <span className="font-data font-medium text-blue-700">
+          {f.serie}-{f.numeroFactura}
+        </span>
+      ),
     },
     { key: "proveedor", header: "Proveedor", cell: (f) => proveedorNombre(f.proveedorId) },
     { key: "oc", header: "Orden de compra", cell: (f) => f.ordenCompraId ?? "—" },
@@ -149,7 +153,9 @@ export default function FacturasProveedorPage() {
           <Modal.Dialog aria-label="Póliza contable de la factura">
             <Modal.CloseTrigger />
             <Modal.Header>
-              <Modal.Heading>Póliza — {facturaVista?.numeroFactura}</Modal.Heading>
+              <Modal.Heading>
+                Póliza — {facturaVista ? `${facturaVista.serie}-${facturaVista.numeroFactura}` : ""}
+              </Modal.Heading>
             </Modal.Header>
             <Modal.Body className="flex flex-col gap-3">
               {polizasVista.length === 0 ? (

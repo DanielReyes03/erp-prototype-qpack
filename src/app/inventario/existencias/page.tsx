@@ -9,16 +9,14 @@ import { KpiCard } from "@/components/patterns/KpiCard";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/format";
 import { useInventarioStore } from "@/lib/store/inventario";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
-import { Boxes, AlertTriangle, TrendingDown } from "lucide-react";
+import type { Locacion } from "@/lib/seed/locaciones";
+import { Boxes, AlertTriangle, Warehouse, BookmarkCheck } from "lucide-react";
 import type { ExistenciaLocacion } from "@/lib/seed/kardex";
 
 function productoDe(id: string) {
   return PRODUCTOS_SEED.find((p) => p.id === id);
-}
-function locacionDe(id: string) {
-  return LOCACIONES_SEED.find((l) => l.id === id);
 }
 
 function ReorderDot({ existencia, puntoReorden }: { existencia: number; puntoReorden: number }) {
@@ -33,6 +31,7 @@ function ReorderDot({ existencia, puntoReorden }: { existencia: number; puntoReo
 
 export default function ExistenciasPage() {
   const existencias = useInventarioStore((s) => s.existencias);
+  const locaciones = useLocacionesStore((s) => s.locaciones);
   const [search, setSearch] = useState("");
   const [locacionFilter, setLocacionFilter] = useState("");
   const [onlyBajoReorden, setOnlyBajoReorden] = useState(false);
@@ -40,27 +39,38 @@ export default function ExistenciasPage() {
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
     return existencias
-      .map((e) => ({ e, producto: productoDe(e.productoId), locacion: locacionDe(e.locacionId) }))
+      .map((e) => ({
+        e,
+        producto: productoDe(e.productoId),
+        locacion: locaciones.find((l) => l.id === e.locacionId),
+      }))
       .filter(({ producto, locacion }) => producto && locacion)
       .filter(({ producto }) => !q || producto!.nombre.toLowerCase().includes(q) || producto!.sku.toLowerCase().includes(q))
       .filter(({ locacion }) => !locacionFilter || locacion!.id === locacionFilter)
-      .filter(({ e, producto }) => !onlyBajoReorden || e.cantidad <= producto!.puntoReorden);
-  }, [existencias, search, locacionFilter, onlyBajoReorden]);
+      .filter(
+        ({ e, producto }) =>
+          !onlyBajoReorden || e.cantidad - (e.reservado ?? 0) <= producto!.puntoReorden,
+      );
+  }, [existencias, locaciones, search, locacionFilter, onlyBajoReorden]);
 
   const valorTotal = useMemo(
     () => existencias.reduce((sum, e) => sum + e.cantidad * e.costoPromedio, 0),
+    [existencias],
+  );
+  const totalReservado = useMemo(
+    () => existencias.reduce((sum, e) => sum + (e.reservado ?? 0), 0),
     [existencias],
   );
   const bajoReorden = useMemo(
     () =>
       existencias.filter((e) => {
         const p = productoDe(e.productoId);
-        return p && e.cantidad <= p.puntoReorden;
+        return p && e.cantidad - (e.reservado ?? 0) <= p.puntoReorden;
       }).length,
     [existencias],
   );
 
-  const columns: DataTableColumn<{ e: ExistenciaLocacion; producto?: (typeof PRODUCTOS_SEED)[number]; locacion?: (typeof LOCACIONES_SEED)[number] }>[] = [
+  const columns: DataTableColumn<{ e: ExistenciaLocacion; producto?: (typeof PRODUCTOS_SEED)[number]; locacion?: Locacion }>[] = [
     {
       key: "producto",
       header: "Producto",
@@ -74,7 +84,7 @@ export default function ExistenciasPage() {
     },
     {
       key: "locacion",
-      header: "Locación",
+      header: "Almacén",
       sortAccessor: (r) => r.locacion?.nombre ?? "",
       cell: (r) => r.locacion?.nombre,
     },
@@ -83,12 +93,35 @@ export default function ExistenciasPage() {
       header: "Existencia",
       align: "right",
       sortAccessor: (r) => r.e.cantidad,
+      cell: (r) => <span className="font-data">{r.e.cantidad.toLocaleString("en-US")}</span>,
+    },
+    {
+      key: "reservado",
+      header: "Reservado",
+      align: "right",
+      sortAccessor: (r) => r.e.reservado ?? 0,
       cell: (r) => (
-        <div className="flex items-center justify-end gap-2">
-          <ReorderDot existencia={r.e.cantidad} puntoReorden={r.producto?.puntoReorden ?? 0} />
-          <span className="font-data">{r.e.cantidad.toLocaleString("en-US")}</span>
-        </div>
+        <span className="font-data text-[#D97706]">
+          {(r.e.reservado ?? 0) > 0 ? (r.e.reservado ?? 0).toLocaleString("en-US") : "—"}
+        </span>
       ),
+    },
+    {
+      key: "disponible",
+      header: "Disponible",
+      align: "right",
+      sortAccessor: (r) => r.e.cantidad - (r.e.reservado ?? 0),
+      cell: (r) => {
+        const disp = r.e.cantidad - (r.e.reservado ?? 0);
+        return (
+          <div className="flex items-center justify-end gap-2">
+            <ReorderDot existencia={disp} puntoReorden={r.producto?.puntoReorden ?? 0} />
+            <span className="font-data font-medium text-slate-900">
+              {disp.toLocaleString("en-US")}
+            </span>
+          </div>
+        );
+      },
     },
     {
       key: "costo",
@@ -116,16 +149,22 @@ export default function ExistenciasPage() {
     <div>
       <PageHeader
         title="Existencias"
-        description="Inventario disponible por producto y locación, valorizado a costo promedio ponderado"
+        description="Inventario disponible por producto y almacén, valorizado a costo promedio ponderado"
       />
 
-      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Valor total de inventario" value={formatMoney(valorTotal)} icon={Boxes} />
+        <KpiCard
+          label="Unidades reservadas"
+          value={totalReservado.toLocaleString("en-US")}
+          icon={BookmarkCheck}
+          tone="warning"
+        />
         <KpiCard label="Renglones bajo punto de reorden" value={String(bajoReorden)} icon={AlertTriangle} />
         <KpiCard
-          label="Locaciones activas"
-          value={String(LOCACIONES_SEED.filter((l) => l.activo).length)}
-          icon={TrendingDown}
+          label="Almacenes activos"
+          value={String(locaciones.filter((l) => l.activo).length)}
+          icon={Warehouse}
         />
       </div>
 
@@ -150,8 +189,8 @@ export default function ExistenciasPage() {
           value={locacionFilter}
           onChange={(e) => setLocacionFilter(e.target.value)}
         >
-          <option value="">Todas las locaciones</option>
-          {LOCACIONES_SEED.map((l) => (
+          <option value="">Todos los almacenes</option>
+          {locaciones.map((l) => (
             <option key={l.id} value={l.id}>
               {l.nombre}
             </option>

@@ -16,11 +16,10 @@ export const STATUS_REGISTRY: Record<string, StatusDef> = {
   "gen:inactivo": { label: "Inactivo", tone: "default" },
 
   // Órdenes de venta
-  "ov:borrador": { label: "Borrador", tone: "default" },
-  "ov:confirmado": { label: "Confirmado", tone: "accent" },
-  "ov:despachado": { label: "Despachado", tone: "accent" },
+  "ov:recibido": { label: "Recibido", tone: "default" },
+  "ov:facturado": { label: "Facturado", tone: "accent" },
+  "ov:programado": { label: "Programado", tone: "warning" },
   "ov:entregado": { label: "Entregado", tone: "success" },
-  "ov:facturado": { label: "Facturado", tone: "success" },
   "ov:anulado": { label: "Anulado", tone: "danger" },
 
   // Cotizaciones
@@ -36,6 +35,11 @@ export const STATUS_REGISTRY: Record<string, StatusDef> = {
   "desp:en-ruta": { label: "En ruta", tone: "accent" },
   "desp:entregado": { label: "Entregado", tone: "success" },
   "desp:con-novedad": { label: "Con novedad", tone: "warning" },
+
+  // Rutas
+  "ruta:programada": { label: "Programada", tone: "default" },
+  "ruta:en-ruta": { label: "En ruta", tone: "accent" },
+  "ruta:finalizada": { label: "Finalizada", tone: "success" },
 
   // Órdenes de compra
   "oc:borrador": { label: "Borrador", tone: "default" },

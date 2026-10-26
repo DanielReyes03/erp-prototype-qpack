@@ -12,19 +12,19 @@ export const clienteSchema = z.object({
   nit: z
     .string()
     .min(1, "Requerido")
-    .refine(isValidNit, "NIT inválido: verificá el dígito verificador. Formato 1234567-8"),
+    .refine(isValidNit, "NIT inválido: verifica el dígito verificador. Formato 1234567-8"),
   nombreComercial: z.string().min(2, "Requerido"),
   razonSocial: z.string().min(2, "Requerido"),
   direccion: z.string().min(5, "Requerido"),
-  departamentoId: z.string().min(1, "Seleccioná un departamento"),
-  municipioId: z.string().min(1, "Seleccioná un municipio"),
+  departamentoId: z.string().min(1, "Selecciona un departamento"),
+  municipioId: z.string().min(1, "Selecciona un municipio"),
   zona: z.string().min(1, "Requerido"),
-  vendedorId: z.string().min(1, "Seleccioná un vendedor"),
-  listaPrecioId: z.string().min(1, "Seleccioná una lista de precios"),
+  vendedorId: z.string().min(1, "Selecciona un vendedor"),
+  listaPrecioId: z.string().min(1, "Selecciona una lista de precios"),
   limiteCredito: z.number({ error: "Requerido" }).min(0, "Debe ser mayor o igual a 0"),
   diasCredito: z.number({ error: "Requerido" }).min(0, "Debe ser mayor o igual a 0"),
   activo: z.boolean(),
-  contactos: z.array(contactoSchema).min(1, "Agregá al menos un contacto"),
+  contactos: z.array(contactoSchema).min(1, "Agrega al menos un contacto"),
 });
 
 export type ClienteFormValues = z.infer<typeof clienteSchema>;

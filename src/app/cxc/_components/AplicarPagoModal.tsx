@@ -39,7 +39,7 @@ export function AplicarPagoModal({ isOpen, onOpenChange, clienteId, documentos }
       .filter((a) => a.monto > 0);
 
     if (aplicaciones.length === 0) {
-      toast.danger("Ingresá al menos un monto a aplicar");
+      toast.danger("Ingresa al menos un monto a aplicar");
       return;
     }
 

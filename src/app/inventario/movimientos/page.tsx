@@ -9,8 +9,8 @@ import { DataTable, type DataTableColumn } from "@/components/patterns/DataTable
 import { MoneyCell } from "@/components/patterns/MoneyCell";
 import { formatDateTime } from "@/lib/format";
 import { useInventarioStore } from "@/lib/store/inventario";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
 import type { MovimientoInventario } from "@/lib/seed/kardex";
 import { MovimientoFormModal } from "./_components/MovimientoFormModal";
 
@@ -27,6 +27,7 @@ function esEntrada(tipo: string) {
 
 export default function MovimientosPage() {
   const movimientos = useInventarioStore((s) => s.movimientos);
+  const locaciones = useLocacionesStore((s) => s.locaciones);
   const [search, setSearch] = useState("");
   const [tipoFilter, setTipoFilter] = useState("");
   const [formOpen, setFormOpen] = useState(false);
@@ -82,7 +83,7 @@ export default function MovimientosPage() {
         );
       },
     },
-    { key: "locacion", header: "Locación", cell: (m) => LOCACIONES_SEED.find((l) => l.id === m.locacionId)?.nombre },
+    { key: "locacion", header: "Almacén", cell: (m) => locaciones.find((l) => l.id === m.locacionId)?.nombre },
     { key: "documento", header: "Documento", cell: (m) => <span className="font-data">{m.documentoReferencia ?? "—"}</span> },
     { key: "motivo", header: "Motivo", cell: (m) => m.motivo },
     {

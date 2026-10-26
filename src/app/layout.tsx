@@ -30,7 +30,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${plexMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="h-full min-h-screen bg-background text-foreground font-sans text-sm">
+      {/* suppressHydrationWarning: algunas extensiones del navegador (p. ej. ColorZilla)
+          inyectan atributos como `cz-shortcut-listen` en <body> antes de que React hidrate. */}
+      <body
+        className="h-full min-h-screen bg-background text-foreground font-sans text-sm"
+        suppressHydrationWarning
+      >
         <AppShell>{children}</AppShell>
       </body>
     </html>

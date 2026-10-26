@@ -4,7 +4,7 @@ export const vendedorSchema = z.object({
   nombre: z.string().min(2, "Requerido"),
   email: z.email("Correo inválido"),
   telefono: z.string().min(7, "Teléfono inválido"),
-  zonaAsignada: z.string().min(1, "Seleccioná una zona"),
+  zonaAsignada: z.string().min(1, "Selecciona una zona"),
   porcentajeComision: z.number({ error: "Requerido" }).min(0).max(100),
   activo: z.boolean(),
 });

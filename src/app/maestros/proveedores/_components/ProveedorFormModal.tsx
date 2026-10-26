@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Tabs, toast } from "@heroui/react";
+import { Plus, Trash2 } from "lucide-react";
+import { Tabs, Button, toast } from "@heroui/react";
 import { FormModal } from "@/components/patterns/FormModal";
 import { FormTextField, FormSelect, FormNumberField, FormSwitch } from "@/components/patterns/form-fields";
 import { useProveedoresStore } from "@/lib/store/proveedores";
@@ -31,6 +32,13 @@ function toFormValues(p: Proveedor): ProveedorFormValues {
     diasCredito: p.diasCredito,
     activo: p.activo,
     datosBancarios: { ...p.datosBancarios },
+    direccionesEntrega: (p.direccionesEntrega ?? []).map((d) => ({
+      alias: d.alias,
+      direccion: d.direccion,
+      departamentoId: d.departamentoId,
+      municipioId: d.municipioId,
+      referencia: d.referencia ?? "",
+    })),
   };
 }
 
@@ -44,6 +52,11 @@ export function ProveedorFormModal({ isOpen, onOpenChange, proveedor }: Proveedo
     defaultValues: proveedor ? toFormValues(proveedor) : EMPTY_PROVEEDOR_FORM,
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "direccionesEntrega",
+  });
+
   useEffect(() => {
     if (isOpen) form.reset(proveedor ? toFormValues(proveedor) : EMPTY_PROVEEDOR_FORM);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -53,11 +66,19 @@ export function ProveedorFormModal({ isOpen, onOpenChange, proveedor }: Proveedo
   const municipioOptions = municipiosDe(departamentoId).map((m) => ({ id: m.id, label: m.nombre }));
 
   async function handleSubmit(values: ProveedorFormValues) {
+    const payload = {
+      ...values,
+      direccionesEntrega: values.direccionesEntrega.map((d, i) => ({
+        ...d,
+        referencia: d.referencia || undefined,
+        id: proveedor?.direccionesEntrega?.[i]?.id ?? `${proveedor?.id ?? "prov"}-dir-${Date.now()}-${i}`,
+      })),
+    };
     if (isEditing && proveedor) {
-      await updateProveedor(proveedor.id, values);
+      await updateProveedor(proveedor.id, payload);
       toast.success("Proveedor actualizado", { description: values.nombreComercial });
     } else {
-      await createProveedor(values);
+      await createProveedor(payload);
       toast.success("Proveedor creado", { description: values.nombreComercial });
     }
   }
@@ -82,6 +103,10 @@ export function ProveedorFormModal({ isOpen, onOpenChange, proveedor }: Proveedo
             </Tabs.Tab>
             <Tabs.Tab id="bancarios">
               Datos bancarios
+              <Tabs.Indicator />
+            </Tabs.Tab>
+            <Tabs.Tab id="direcciones">
+              Direcciones de entrega ({fields.length})
               <Tabs.Indicator />
             </Tabs.Tab>
           </Tabs.List>
@@ -109,7 +134,7 @@ export function ProveedorFormModal({ isOpen, onOpenChange, proveedor }: Proveedo
               label="Municipio"
               isRequired
               options={municipioOptions}
-              placeholder={departamentoId ? "Seleccionar…" : "Elegí un departamento primero"}
+              placeholder={departamentoId ? "Seleccionar…" : "Elige un departamento primero"}
             />
           </div>
 
@@ -164,6 +189,88 @@ export function ProveedorFormModal({ isOpen, onOpenChange, proveedor }: Proveedo
               ]}
             />
           </div>
+        </Tabs.Panel>
+
+        <Tabs.Panel id="direcciones" className="flex flex-col gap-4 pt-4">
+          <p className="text-xs text-slate-500">
+            Puntos de entrega del proveedor (plantas, bodegas, centros de acopio). Se usan al
+            programar recepciones y despachos.
+          </p>
+          {fields.map((field, index) => {
+            const depId = form.watch(`direccionesEntrega.${index}.departamentoId`);
+            return (
+              <div key={field.id} className="rounded-md border border-slate-200 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                    Dirección {index + 1}
+                  </p>
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="ghost"
+                    aria-label="Quitar dirección"
+                    onPress={() => remove(index)}
+                  >
+                    <Trash2 className="size-4 text-danger" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <FormTextField
+                    control={form.control}
+                    name={`direccionesEntrega.${index}.alias`}
+                    label="Alias"
+                    placeholder="Planta Amatitlán"
+                    isRequired
+                  />
+                  <FormTextField
+                    control={form.control}
+                    name={`direccionesEntrega.${index}.referencia`}
+                    label="Referencia / horario"
+                    placeholder="Portón 3, 7:00–15:00"
+                  />
+                  <FormTextField
+                    control={form.control}
+                    name={`direccionesEntrega.${index}.direccion`}
+                    label="Dirección"
+                    className="col-span-2"
+                    isRequired
+                  />
+                  <FormSelect
+                    control={form.control}
+                    name={`direccionesEntrega.${index}.departamentoId`}
+                    label="Departamento"
+                    isRequired
+                    options={DEPARTAMENTOS.map((d) => ({ id: d.id, label: d.nombre }))}
+                  />
+                  <FormSelect
+                    control={form.control}
+                    name={`direccionesEntrega.${index}.municipioId`}
+                    label="Municipio"
+                    isRequired
+                    options={municipiosDe(depId).map((m) => ({ id: m.id, label: m.nombre }))}
+                    placeholder={depId ? "Seleccionar…" : "Elige un departamento primero"}
+                  />
+                </div>
+              </div>
+            );
+          })}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="self-start"
+            onPress={() =>
+              append({
+                alias: "",
+                direccion: "",
+                departamentoId: "",
+                municipioId: "",
+                referencia: "",
+              })
+            }
+          >
+            <Plus className="size-4" />
+            Agregar dirección
+          </Button>
         </Tabs.Panel>
       </Tabs>
     </FormModal>

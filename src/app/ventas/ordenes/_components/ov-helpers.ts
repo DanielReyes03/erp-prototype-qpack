@@ -3,6 +3,7 @@ import type { OrdenVenta } from "@/lib/seed/ordenes-venta";
 import { CLIENTES_SEED } from "@/lib/seed/clientes";
 import { VENDEDORES_SEED } from "@/lib/seed/vendedores";
 import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 
 export function clienteDe(id: string) {
   return CLIENTES_SEED.find((c) => c.id === id);
@@ -11,13 +12,17 @@ export function vendedorDe(id: string) {
   return VENDEDORES_SEED.find((v) => v.id === id);
 }
 export function locacionDe(id: string) {
-  return LOCACIONES_SEED.find((l) => l.id === id);
+  return (
+    useLocacionesStore.getState().locaciones.find((l) => l.id === id) ??
+    LOCACIONES_SEED.find((l) => l.id === id)
+  );
 }
 
 export const OV_STEPS: DocumentStep[] = [
-  { key: "pedido", label: "Pedido" },
-  { key: "despacho", label: "Despacho" },
-  { key: "entrega", label: "Entrega" },
+  { key: "recibido", label: "Recibido" },
+  { key: "facturado", label: "Facturado" },
+  { key: "programado", label: "Programado" },
+  { key: "entregado", label: "Entregado" },
 ];
 
 export function ovStepperProps(orden: OrdenVenta): {
@@ -26,16 +31,17 @@ export function ovStepperProps(orden: OrdenVenta): {
   steps: DocumentStep[];
 } {
   const steps: DocumentStep[] = [
-    { key: "pedido", label: "Pedido", date: orden.fechaConfirmacion },
-    { key: "despacho", label: "Despacho", date: orden.fechaDespacho },
-    { key: "entrega", label: "Entrega", date: orden.fechaEntrega },
+    { key: "recibido", label: "Recibido", date: orden.fechaRecepcion },
+    { key: "facturado", label: "Facturado", date: orden.fechaFacturacion },
+    { key: "programado", label: "Programado", date: orden.fechaProgramacion },
+    { key: "entregado", label: "Entregado", date: orden.fechaEntrega },
   ];
 
-  let currentKey = "pedido";
-  if (orden.estado === "borrador") currentKey = "pedido";
-  else if (orden.estado === "confirmado") currentKey = "despacho";
-  else if (orden.estado === "despachado") currentKey = "entrega";
-  else if (orden.estado === "entregado" || orden.estado === "facturado") currentKey = "completado";
+  let currentKey = "recibido";
+  if (orden.estado === "recibido") currentKey = "recibido";
+  else if (orden.estado === "facturado") currentKey = "facturado";
+  else if (orden.estado === "programado") currentKey = "programado";
+  else if (orden.estado === "entregado") currentKey = "completado";
 
   return { steps, currentKey, cancelled: orden.estado === "anulado" };
 }

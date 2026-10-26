@@ -9,6 +9,7 @@ import { useListasPreciosStore } from "@/lib/store/listas-precios";
 import { useLocacionesStore } from "@/lib/store/locaciones";
 import { useInventarioStore } from "@/lib/store/inventario";
 import { useOrdenesVentaStore } from "@/lib/store/ordenes-venta";
+import { useRutasStore } from "@/lib/store/rutas";
 import { useCotizacionesStore } from "@/lib/store/cotizaciones";
 import { useOrdenesCompraStore } from "@/lib/store/ordenes-compra";
 import { useFacturasProveedorStore } from "@/lib/store/facturas-proveedor";
@@ -32,6 +33,7 @@ const STORES = [
   useLocacionesStore,
   useInventarioStore,
   useOrdenesVentaStore,
+  useRutasStore,
   useCotizacionesStore,
   useOrdenesCompraStore,
   useFacturasProveedorStore,

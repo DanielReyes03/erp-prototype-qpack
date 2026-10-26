@@ -57,7 +57,7 @@ export default function AsientosManualesPage() {
         rows={asientos}
         getRowId={(p) => p.id}
         emptyTitle="Sin asientos manuales"
-        emptyDescription="Registrá tu primer asiento manual con el botón «Nuevo asiento»."
+        emptyDescription="Registra tu primer asiento manual con el botón «Nuevo asiento»."
         onRowClick={(p) => setPolizaVista(p)}
       />
 

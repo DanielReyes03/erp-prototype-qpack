@@ -54,6 +54,9 @@ interface InventarioState {
   getExistencia: (productoId: string, locacionId: string) => ExistenciaLocacion | undefined;
   getExistenciaTotal: (productoId: string) => number;
   getCostoPromedio: (productoId: string, locacionId: string) => number;
+  getDisponible: (productoId: string, locacionId: string) => number;
+  reservar: (productoId: string, locacionId: string, cantidad: number) => void;
+  liberarReserva: (productoId: string, locacionId: string, cantidad: number) => void;
   registrarEntrada: (input: EntradaInput) => Promise<void>;
   registrarSalida: (input: SalidaInput) => Promise<void>;
   registrarAjuste: (input: AjusteInput) => Promise<void>;
@@ -71,7 +74,10 @@ function applyMovimiento(
   const idx = existencias.findIndex(
     (e) => e.productoId === productoId && e.locacionId === locacionId,
   );
-  const prev = idx >= 0 ? existencias[idx] : { productoId, locacionId, cantidad: 0, costoPromedio: 0 };
+  const prev =
+    idx >= 0
+      ? existencias[idx]
+      : { productoId, locacionId, cantidad: 0, costoPromedio: 0, reservado: 0 };
 
   const esEntrada = tipo === "entrada" || tipo === "ajuste-positivo" || tipo === "traslado-entrada";
   let nuevaCantidad: number;
@@ -96,6 +102,7 @@ function applyMovimiento(
     locacionId,
     cantidad: round2(nuevaCantidad),
     costoPromedio: round2(nuevoCosto),
+    reservado: prev.reservado ?? 0,
   };
 
   const next = [...existencias];
@@ -132,6 +139,42 @@ export const useInventarioStore = create<InventarioState>()(
 
       getCostoPromedio(productoId, locacionId) {
         return get().getExistencia(productoId, locacionId)?.costoPromedio ?? 0;
+      },
+
+      getDisponible(productoId, locacionId) {
+        const e = get().getExistencia(productoId, locacionId);
+        return round2((e?.cantidad ?? 0) - (e?.reservado ?? 0));
+      },
+
+      reservar(productoId, locacionId, cantidad) {
+        if (cantidad <= 0) return;
+        const { existencias } = get();
+        const idx = existencias.findIndex(
+          (e) => e.productoId === productoId && e.locacionId === locacionId,
+        );
+        if (idx >= 0) {
+          const next = [...existencias];
+          next[idx] = { ...next[idx], reservado: round2((next[idx].reservado ?? 0) + cantidad) };
+          set({ existencias: next });
+        } else {
+          set({
+            existencias: [
+              ...existencias,
+              { productoId, locacionId, cantidad: 0, costoPromedio: 0, reservado: round2(cantidad) },
+            ],
+          });
+        }
+      },
+
+      liberarReserva(productoId, locacionId, cantidad) {
+        if (cantidad <= 0) return;
+        set({
+          existencias: get().existencias.map((e) =>
+            e.productoId === productoId && e.locacionId === locacionId
+              ? { ...e, reservado: round2(Math.max(0, (e.reservado ?? 0) - cantidad)) }
+              : e,
+          ),
+        });
       },
 
       async registrarEntrada(input) {

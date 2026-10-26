@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export const trasladoSchema = z
   .object({
-    productoId: z.string().min(1, "Seleccioná un producto"),
-    locacionOrigenId: z.string().min(1, "Seleccioná la locación de origen"),
-    locacionDestinoId: z.string().min(1, "Seleccioná la locación de destino"),
+    productoId: z.string().min(1, "Selecciona un producto"),
+    locacionOrigenId: z.string().min(1, "Selecciona la locación de origen"),
+    locacionDestinoId: z.string().min(1, "Selecciona la locación de destino"),
     cantidad: z.number({ error: "Requerido" }).positive("Debe ser mayor a 0"),
     motivo: z.string().min(3, "Requerido"),
     documentoReferencia: z.string().optional(),

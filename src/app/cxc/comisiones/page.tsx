@@ -25,7 +25,10 @@ export default function ComisionesPage() {
   const ordenes = useOrdenesVentaStore((s) => s.ordenes);
 
   const filas = useMemo<FilaComision[]>(() => {
-    const facturadas = ordenes.filter((o) => o.estado === "facturado");
+    // Toda orden que ya generó factura (facturada, programada o entregada).
+    const facturadas = ordenes.filter(
+      (o) => o.estado === "facturado" || o.estado === "programado" || o.estado === "entregado",
+    );
     return VENDEDORES_SEED.map((v) => {
       const propias = facturadas.filter((o) => o.vendedorId === v.id);
       const totalVendido = propias.reduce((s, o) => s + computeTotals(o.lineas).total, 0);

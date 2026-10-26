@@ -4,12 +4,14 @@ import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
-import { Button, toast } from "@heroui/react";
+import { Button, Select, ListBox, Label, toast } from "@heroui/react";
 import { FormModal } from "@/components/patterns/FormModal";
 import { FormSelect, FormTextField, FormNumberField } from "@/components/patterns/form-fields";
 import { useInventarioStore } from "@/lib/store/inventario";
+import { useOrdenesCompraStore } from "@/lib/store/ordenes-compra";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
+import { PROVEEDORES_SEED } from "@/lib/seed/proveedores";
 import {
   movimientoSchema,
   EMPTY_MOVIMIENTO_FORM,
@@ -28,13 +30,41 @@ export function MovimientoFormModal({ isOpen, onOpenChange }: MovimientoFormModa
   const registrarAjuste = useInventarioStore((s) => s.registrarAjuste);
   const getExistencia = useInventarioStore((s) => s.getExistencia);
   const getCostoPromedio = useInventarioStore((s) => s.getCostoPromedio);
+  const ordenesCompra = useOrdenesCompraStore((s) => s.ordenes);
+  const locaciones = useLocacionesStore((s) => s.locaciones);
+  const locacionesActivas = locaciones.filter((l) => l.activo);
 
   const form = useForm<MovimientoFormValues>({
     resolver: zodResolver(movimientoSchema),
     defaultValues: EMPTY_MOVIMIENTO_FORM,
   });
 
-  const { fields, append, remove } = useFieldArray({ control: form.control, name: "lineas" });
+  const { fields, append, remove, replace } = useFieldArray({ control: form.control, name: "lineas" });
+
+  const ordenesEntrada = ordenesCompra.filter(
+    (o) => o.estado === "confirmada" || o.estado === "recibida-parcial",
+  );
+
+  function aplicarOrdenCompra(ocId: string | null) {
+    form.setValue("ordenCompraId", ocId ?? "");
+    if (!ocId) return;
+    const oc = ordenesCompra.find((o) => o.id === ocId);
+    if (!oc) return;
+    const pendientes = oc.lineas
+      .filter((l) => l.cantidad - l.cantidadRecibida > 0)
+      .map((l) => ({
+        productoId: l.productoId,
+        cantidad: l.cantidad - l.cantidadRecibida,
+        costoUnitario: l.costoUnitario,
+      }));
+    if (pendientes.length > 0) replace(pendientes);
+    form.setValue("locacionId", oc.locacionId, { shouldValidate: true });
+    form.setValue("documentoReferencia", oc.id);
+    const prov = PROVEEDORES_SEED.find((p) => p.id === oc.proveedorId);
+    form.setValue("motivo", `Recepción de compra ${oc.id}${prov ? ` — ${prov.nombreComercial}` : ""}`, {
+      shouldValidate: true,
+    });
+  }
 
   useEffect(() => {
     if (isOpen) form.reset(EMPTY_MOVIMIENTO_FORM);
@@ -78,7 +108,7 @@ export function MovimientoFormModal({ isOpen, onOpenChange }: MovimientoFormModa
     }
 
     toast.success("Movimiento registrado", {
-      description: `${values.lineas.length} línea(s) aplicadas a ${LOCACIONES_SEED.find((l) => l.id === values.locacionId)?.nombre}`,
+      description: `${values.lineas.length} línea(s) aplicadas a ${locaciones.find((l) => l.id === values.locacionId)?.nombre}`,
     });
   }
 
@@ -87,7 +117,7 @@ export function MovimientoFormModal({ isOpen, onOpenChange }: MovimientoFormModa
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       title="Nuevo movimiento de inventario"
-      description="Registrá una entrada, salida o ajuste con una o más líneas de producto."
+      description="Registra una entrada, salida o ajuste con una o más líneas de producto."
       size="lg"
       form={form}
       onSubmit={handleSubmit}
@@ -104,9 +134,9 @@ export function MovimientoFormModal({ isOpen, onOpenChange }: MovimientoFormModa
         <FormSelect
           control={form.control}
           name="locacionId"
-          label="Locación"
+          label="Almacén"
           isRequired
-          options={LOCACIONES_SEED.map((l) => ({ id: l.id, label: l.nombre }))}
+          options={locacionesActivas.map((l) => ({ id: l.id, label: l.nombre }))}
         />
         <FormTextField
           control={form.control}
@@ -115,6 +145,41 @@ export function MovimientoFormModal({ isOpen, onOpenChange }: MovimientoFormModa
           placeholder="OC-000123"
         />
       </div>
+
+      {tipo === "entrada" ? (
+        <Select
+          className="flex flex-col gap-1"
+          placeholder={
+            ordenesEntrada.length ? "Sin orden asociada" : "No hay órdenes de compra pendientes"
+          }
+          value={form.watch("ordenCompraId") || null}
+          isDisabled={ordenesEntrada.length === 0}
+          onChange={(k) => aplicarOrdenCompra(k ? String(k) : null)}
+        >
+          <Label>Orden de compra (opcional)</Label>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {ordenesEntrada.map((o) => {
+                const prov = PROVEEDORES_SEED.find((p) => p.id === o.proveedorId);
+                return (
+                  <ListBox.Item key={o.id} id={o.id} textValue={o.id}>
+                    <div className="flex flex-col">
+                      <span className="font-data text-sm">{o.id}</span>
+                      <span className="text-xs text-slate-500">{prov?.nombreComercial}</span>
+                    </div>
+                    <ListBox.ItemIndicator />
+                  </ListBox.Item>
+                );
+              })}
+            </ListBox>
+          </Select.Popover>
+        </Select>
+      ) : null}
+
       <FormTextField
         control={form.control}
         name="motivo"

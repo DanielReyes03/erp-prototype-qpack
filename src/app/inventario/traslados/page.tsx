@@ -8,8 +8,8 @@ import { FilterBar } from "@/components/patterns/FilterBar";
 import { DataTable, type DataTableColumn } from "@/components/patterns/DataTable";
 import { formatDateTime } from "@/lib/format";
 import { useInventarioStore } from "@/lib/store/inventario";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
 import { TrasladoFormModal } from "./_components/TrasladoFormModal";
 
 interface TrasladoRow {
@@ -23,14 +23,13 @@ interface TrasladoRow {
   motivo: string;
 }
 
-function locacionNombre(id: string) {
-  return LOCACIONES_SEED.find((l) => l.id === id)?.nombre ?? "—";
-}
-
 export default function TrasladosPage() {
   const movimientos = useInventarioStore((s) => s.movimientos);
+  const locaciones = useLocacionesStore((s) => s.locaciones);
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
+
+  const locacionNombre = (id: string) => locaciones.find((l) => l.id === id)?.nombre ?? "—";
 
   const rows: TrasladoRow[] = useMemo(() => {
     const salidas = movimientos.filter((m) => m.tipo === "traslado-salida");

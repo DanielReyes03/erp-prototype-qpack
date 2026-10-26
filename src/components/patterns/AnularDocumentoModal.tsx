@@ -8,7 +8,7 @@ import { FormModal } from "@/components/patterns/FormModal";
 import { FormTextArea } from "@/components/patterns/form-fields";
 
 const schema = z.object({
-  motivo: z.string().min(5, "Indicá el motivo de anulación (mínimo 5 caracteres)"),
+  motivo: z.string().min(5, "Indica el motivo de anulación (mínimo 5 caracteres)"),
 });
 type FormValues = z.infer<typeof schema>;
 

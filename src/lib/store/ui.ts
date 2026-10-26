@@ -6,8 +6,6 @@ interface UiState {
   toggleSidebar: () => void;
   isCommandPaletteOpen: boolean;
   setCommandPaletteOpen: (open: boolean) => void;
-  activeCompanyId: string;
-  setActiveCompanyId: (id: string) => void;
 }
 
 export const useUiStore = create<UiState>()(
@@ -17,8 +15,6 @@ export const useUiStore = create<UiState>()(
       toggleSidebar: () => set((s) => ({ isSidebarCollapsed: !s.isSidebarCollapsed })),
       isCommandPaletteOpen: false,
       setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
-      activeCompanyId: "qpack-gt",
-      setActiveCompanyId: (id) => set({ activeCompanyId: id }),
     }),
     { name: "qpack-ui", skipHydration: true },
   ),

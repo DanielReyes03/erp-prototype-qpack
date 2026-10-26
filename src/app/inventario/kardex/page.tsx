@@ -10,8 +10,8 @@ import { EmptyState } from "@/components/patterns/EmptyState";
 import { cn } from "@/lib/cn";
 import { formatDateTime } from "@/lib/format";
 import { useInventarioStore } from "@/lib/store/inventario";
+import { useLocacionesStore } from "@/lib/store/locaciones";
 import { PRODUCTOS_SEED } from "@/lib/seed/productos";
-import { LOCACIONES_SEED } from "@/lib/seed/locaciones";
 import type { MovimientoInventario } from "@/lib/seed/kardex";
 
 const TIPO_LABEL: Record<string, string> = {
@@ -29,6 +29,7 @@ function esEntrada(tipo: string) {
 
 export default function KardexPage() {
   const movimientos = useInventarioStore((s) => s.movimientos);
+  const locaciones = useLocacionesStore((s) => s.locaciones);
   const [productoId, setProductoId] = useState<string>(PRODUCTOS_SEED[0].id);
   const [locacionId, setLocacionId] = useState<string>("");
 
@@ -62,7 +63,7 @@ export default function KardexPage() {
         </div>
       ),
     },
-    { key: "locacion", header: "Locación", cell: (m) => LOCACIONES_SEED.find((l) => l.id === m.locacionId)?.nombre },
+    { key: "locacion", header: "Almacén", cell: (m) => locaciones.find((l) => l.id === m.locacionId)?.nombre },
     { key: "documento", header: "Documento", cell: (m) => <span className="font-data">{m.documentoReferencia ?? "—"}</span> },
     { key: "motivo", header: "Motivo", cell: (m) => m.motivo },
     {
@@ -143,18 +144,18 @@ export default function KardexPage() {
 
         <Select
           className="flex flex-col gap-1"
-          placeholder="Todas las locaciones"
+          placeholder="Todos los almacenes"
           value={locacionId || null}
           onChange={(k) => setLocacionId(k ? String(k) : "")}
         >
-          <Label>Locación</Label>
+          <Label>Almacén</Label>
           <Select.Trigger>
             <Select.Value />
             <Select.Indicator />
           </Select.Trigger>
           <Select.Popover>
             <ListBox>
-              {LOCACIONES_SEED.map((l) => (
+              {locaciones.map((l) => (
                 <ListBox.Item key={l.id} id={l.id} textValue={l.nombre}>
                   {l.nombre}
                   <ListBox.ItemIndicator />

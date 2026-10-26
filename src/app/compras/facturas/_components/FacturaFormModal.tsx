@@ -16,6 +16,11 @@ interface FacturaFormModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+function totalOrdenCompra(lineas: { cantidad: number; costoUnitario: number }[]): number {
+  const neto = lineas.reduce((sum, l) => sum + l.cantidad * l.costoUnitario, 0);
+  return Math.round(neto * 1.12 * 100) / 100;
+}
+
 export function FacturaFormModal({ isOpen, onOpenChange }: FacturaFormModalProps) {
   const crearFactura = useFacturasProveedorStore((s) => s.crearFactura);
   const ordenesCompra = useOrdenesCompraStore((s) => s.ordenes);
@@ -32,6 +37,8 @@ export function FacturaFormModal({ isOpen, onOpenChange }: FacturaFormModalProps
   }, [isOpen]);
 
   const proveedorId = form.watch("proveedorId");
+  const ordenCompraId = form.watch("ordenCompraId");
+
   const ordenesDisponibles = ordenesCompra.filter(
     (o) =>
       o.proveedorId === proveedorId &&
@@ -39,15 +46,36 @@ export function FacturaFormModal({ isOpen, onOpenChange }: FacturaFormModalProps
       !facturas.some((f) => f.ordenCompraId === o.id),
   );
 
+  // Cambiar de proveedor invalida la OC seleccionada.
+  useEffect(() => {
+    if (ordenCompraId && !ordenesDisponibles.some((o) => o.id === ordenCompraId)) {
+      form.setValue("ordenCompraId", "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proveedorId]);
+
+  // Al elegir la OC, prefijar monto y moneda con el total de la orden.
+  useEffect(() => {
+    const oc = ordenesCompra.find((o) => o.id === ordenCompraId);
+    if (oc) {
+      form.setValue("monto", totalOrdenCompra(oc.lineas), { shouldValidate: true });
+      form.setValue("moneda", oc.moneda);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ordenCompraId]);
+
   async function handleSubmit(values: FacturaFormValues) {
     await crearFactura({
       proveedorId: values.proveedorId,
-      ordenCompraId: values.ordenCompraId || undefined,
+      ordenCompraId: values.ordenCompraId,
+      serie: values.serie,
       numeroFactura: values.numeroFactura,
       monto: values.monto,
       moneda: values.moneda,
     });
-    toast.success("Factura de proveedor registrada", { description: values.numeroFactura });
+    toast.success("Factura de proveedor registrada", {
+      description: `${values.serie}-${values.numeroFactura}`,
+    });
   }
 
   return (
@@ -73,12 +101,28 @@ export function FacturaFormModal({ isOpen, onOpenChange }: FacturaFormModalProps
       <FormSelect
         control={form.control}
         name="ordenCompraId"
-        label="Orden de compra (opcional)"
+        label="Orden de compra"
+        isRequired
         options={ordenesDisponibles.map((o) => ({ id: o.id, label: o.id }))}
-        placeholder={proveedorId ? "Sin orden asociada" : "Elegí un proveedor primero"}
+        placeholder={proveedorId ? "Selecciona una orden de compra" : "Elige un proveedor primero"}
         description="Solo se muestran órdenes recibidas totalmente y sin factura registrada"
       />
-      <FormTextField control={form.control} name="numeroFactura" label="Número de factura (SAT)" isRequired />
+      <div className="grid grid-cols-3 gap-4">
+        <FormTextField
+          control={form.control}
+          name="serie"
+          label="Serie"
+          placeholder="A"
+          isRequired
+        />
+        <FormTextField
+          control={form.control}
+          name="numeroFactura"
+          label="Número"
+          className="col-span-2"
+          isRequired
+        />
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <FormNumberField
           control={form.control}

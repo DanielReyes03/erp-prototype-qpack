@@ -2,18 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Bell, RotateCcw, Building2, ChevronDown, UserCog } from "lucide-react";
+import { Search, Bell, RotateCcw, UserCog } from "lucide-react";
 import { Button, Dropdown, Label, Description, Popover, Kbd, Avatar, Badge, Separator } from "@heroui/react";
 import { useUiStore } from "@/lib/store/ui";
 import { resetDemoData } from "@/lib/store/reset";
 import { ConfirmDialog } from "@/components/patterns/ConfirmDialog";
 import { useSeguridadStore, useUsuarioActual } from "@/lib/store/seguridad";
 import { Breadcrumb } from "./Breadcrumb";
-
-const COMPANIES = [
-  { id: "qpack-gt", name: "QPack Importadora, S.A." },
-  { id: "qpack-occidente", name: "QPack Occidente, S.A." },
-];
 
 const NOTIFICATIONS = [
   {
@@ -40,8 +35,6 @@ function initials(name: string): string {
 
 export function Topbar() {
   const router = useRouter();
-  const activeCompanyId = useUiStore((s) => s.activeCompanyId);
-  const setActiveCompanyId = useUiStore((s) => s.setActiveCompanyId);
   const setCommandPaletteOpen = useUiStore((s) => s.setCommandPaletteOpen);
   const [isResetOpen, setResetOpen] = useState(false);
 
@@ -50,8 +43,6 @@ export function Topbar() {
   const setCurrentUser = useSeguridadStore((s) => s.setCurrentUser);
   const usuarioActual = useUsuarioActual();
   const rolActual = roles.find((r) => r.id === usuarioActual?.rolId);
-
-  const activeCompany = COMPANIES.find((c) => c.id === activeCompanyId) ?? COMPANIES[0];
 
   return (
     <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200 bg-white px-4 sm:gap-4">
@@ -81,31 +72,6 @@ export function Topbar() {
       >
         <Search className="size-4" />
       </Button>
-
-      <Dropdown>
-        <Button variant="ghost" className="gap-2 text-slate-700">
-          <Building2 className="size-4 text-slate-500" />
-          <span className="hidden max-w-[160px] truncate lg:inline">{activeCompany.name}</span>
-          <ChevronDown className="size-3.5 text-slate-500" />
-        </Button>
-        <Dropdown.Popover className="min-w-[260px]">
-          <Dropdown.Menu
-            selectionMode="single"
-            selectedKeys={new Set([activeCompanyId])}
-            onSelectionChange={(keys) => {
-              const [id] = Array.from(keys);
-              if (typeof id === "string") setActiveCompanyId(id);
-            }}
-          >
-            {COMPANIES.map((company) => (
-              <Dropdown.Item key={company.id} id={company.id} textValue={company.name}>
-                <Dropdown.ItemIndicator />
-                <Label>{company.name}</Label>
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown.Popover>
-      </Dropdown>
 
       <Popover>
         <Button isIconOnly variant="ghost" aria-label="Notificaciones" className="relative">

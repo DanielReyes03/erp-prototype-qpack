@@ -49,6 +49,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Proveedores", href: "/maestros/proveedores" },
       { label: "Vendedores", href: "/maestros/vendedores" },
       { label: "Productos", href: "/maestros/productos" },
+      { label: "Almacenes", href: "/maestros/almacenes" },
       { label: "Listas de precios", href: "/maestros/listas-precios" },
       { label: "Geografía", href: "/maestros/geografia" },
     ],
@@ -107,7 +108,6 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Cuentas bancarias", href: "/tesoreria/cuentas" },
       { label: "Movimientos", href: "/tesoreria/movimientos" },
-      { label: "Cajas chicas", href: "/tesoreria/cajas-chicas" },
     ],
     moduloKey: "tesoreria",
   },

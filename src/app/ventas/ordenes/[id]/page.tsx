@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Truck, PackageCheck, CheckCircle2, Ban, Save } from "lucide-react";
-import { Button, toast } from "@heroui/react";
+import { ArrowLeft, PackageCheck, Ban, Save, FileCheck2 } from "lucide-react";
+import { Button, Spinner, toast } from "@heroui/react";
 import { PageHeader } from "@/components/patterns/PageHeader";
 import { DocumentStepper } from "@/components/patterns/DocumentStepper";
 import { StatusChip } from "@/components/patterns/StatusChip";
@@ -19,11 +19,9 @@ import { clienteDe, vendedorDe, locacionDe, ovStepperProps } from "../_component
 
 export default function OrdenVentaDetallePage() {
   const params = useParams<{ id: string }>();
-  const router = useRouter();
   const ordenes = useOrdenesVentaStore((s) => s.ordenes);
   const actualizarLineas = useOrdenesVentaStore((s) => s.actualizarLineas);
-  const confirmarPedido = useOrdenesVentaStore((s) => s.confirmarPedido);
-  const generarDespacho = useOrdenesVentaStore((s) => s.generarDespacho);
+  const facturar = useOrdenesVentaStore((s) => s.facturar);
   const confirmarEntrega = useOrdenesVentaStore((s) => s.confirmarEntrega);
   const anular = useOrdenesVentaStore((s) => s.anular);
   const getPrecio = useListasPreciosStore((s) => s.getPrecio);
@@ -31,6 +29,7 @@ export default function OrdenVentaDetallePage() {
   const orden = ordenes.find((o) => o.id === params.id);
   const [lineas, setLineas] = useState<LineItem[]>(orden?.lineas ?? []);
   const [isPending, setIsPending] = useState(false);
+  const [certifying, setCertifying] = useState(false);
   const [anularOpen, setAnularOpen] = useState(false);
 
   useEffect(() => {
@@ -63,8 +62,9 @@ export default function OrdenVentaDetallePage() {
     );
   }
 
-  const isBorrador = orden.estado === "borrador";
-  const isDirty = isBorrador && JSON.stringify(lineas) !== JSON.stringify(orden.lineas);
+  const isRecibido = orden.estado === "recibido";
+  const isDirty = isRecibido && JSON.stringify(lineas) !== JSON.stringify(orden.lineas);
+  const puedeAnular = orden.estado !== "anulado";
   const { steps, currentKey, cancelled } = ovStepperProps(orden);
 
   async function runAction(fn: () => Promise<void>, successMsg: string) {
@@ -78,6 +78,20 @@ export default function OrdenVentaDetallePage() {
       });
     } finally {
       setIsPending(false);
+    }
+  }
+
+  async function handleFacturar() {
+    setCertifying(true);
+    try {
+      await facturar(orden!.id);
+      toast.success("Orden facturada", { description: orden!.id });
+    } catch (err) {
+      toast.danger("No se pudo facturar", {
+        description: err instanceof Error ? err.message : "Error desconocido",
+      });
+    } finally {
+      setCertifying(false);
     }
   }
 
@@ -122,7 +136,7 @@ export default function OrdenVentaDetallePage() {
           <p className="text-sm font-medium text-slate-900">{vendedor?.nombre ?? "—"}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-500">Locación de despacho</p>
+          <p className="text-xs text-slate-500">Almacén</p>
           <p className="text-sm font-medium text-slate-900">{locacion?.nombre ?? "—"}</p>
         </div>
       </div>
@@ -133,9 +147,19 @@ export default function OrdenVentaDetallePage() {
           onChange={setLineas}
           products={products}
           currency={orden.moneda}
-          isDisabled={!isBorrador}
+          isDisabled={!isRecibido}
         />
       </div>
+
+      {orden.estado === "facturado" ? (
+        <p className="mb-4 text-sm text-slate-500">
+          Programa esta orden agregándola a una ruta en{" "}
+          <Link href="/ventas/despachos" className="text-blue-700 hover:underline">
+            Despachos y rutas
+          </Link>
+          , o márcala como entregada directamente.
+        </p>
+      ) : null}
 
       <div className="flex flex-wrap items-center justify-end gap-2">
         {isDirty ? (
@@ -153,63 +177,44 @@ export default function OrdenVentaDetallePage() {
           </Button>
         ) : null}
 
-        {orden.estado === "borrador" ? (
-          <>
-            <Button
-              variant="danger-soft"
-              isDisabled={isPending}
-              onPress={() => setAnularOpen(true)}
-            >
-              <Ban className="size-4" />
-              Anular
-            </Button>
-            <Button
-              isPending={isPending}
-              isDisabled={isDirty || lineas.length === 0}
-              onPress={() => runAction(() => confirmarPedido(orden.id), "Pedido confirmado")}
-            >
-              <CheckCircle2 className="size-4" />
-              Confirmar pedido
-            </Button>
-          </>
+        {puedeAnular ? (
+          <Button variant="danger-soft" isDisabled={isPending || certifying} onPress={() => setAnularOpen(true)}>
+            <Ban className="size-4" />
+            Anular
+          </Button>
         ) : null}
 
-        {orden.estado === "confirmado" ? (
-          <>
-            <Button
-              variant="danger-soft"
-              isDisabled={isPending}
-              onPress={() => setAnularOpen(true)}
-            >
-              <Ban className="size-4" />
-              Anular
-            </Button>
-            <Button
-              isPending={isPending}
-              onPress={() => runAction(() => generarDespacho(orden.id), "Despacho generado")}
-            >
-              <Truck className="size-4" />
-              Generar despacho
-            </Button>
-          </>
+        {orden.estado === "recibido" ? (
+          <Button
+            isPending={certifying}
+            isDisabled={isDirty || lineas.length === 0}
+            onPress={handleFacturar}
+          >
+            <FileCheck2 className="size-4" />
+            Facturar
+          </Button>
         ) : null}
 
-        {orden.estado === "despachado" ? (
+        {orden.estado === "facturado" || orden.estado === "programado" ? (
           <Button
             isPending={isPending}
             onPress={() => runAction(() => confirmarEntrega(orden.id), "Entrega confirmada")}
           >
             <PackageCheck className="size-4" />
-            Confirmar entrega
-          </Button>
-        ) : null}
-
-        {orden.estado === "entregado" ? (
-          <Button onPress={() => router.push(`/dte/nuevo?ovId=${orden.id}`)}>
-            Facturar (emitir DTE)
+            Marcar entregado
           </Button>
         ) : null}
       </div>
+
+      {certifying ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-slate-200 bg-white px-8 py-6 shadow-surface">
+            <Spinner size="lg" />
+            <p className="text-sm font-medium text-slate-900">Certificando con SAT…</p>
+            <p className="text-xs text-slate-500">Generando el DTE y descargando el inventario</p>
+          </div>
+        </div>
+      ) : null}
 
       <AnularDocumentoModal
         isOpen={anularOpen}

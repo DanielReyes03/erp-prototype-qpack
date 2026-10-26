@@ -147,7 +147,7 @@ export function LineItemsEditor({
                   <td colSpan={7}>
                     <EmptyState
                       title="Sin líneas agregadas"
-                      description="Agregá al menos un producto para continuar."
+                      description="Agrega al menos un producto para continuar."
                     />
                   </td>
                 </tr>

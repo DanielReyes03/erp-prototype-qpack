@@ -7,6 +7,15 @@ export interface DatosBancarios {
   moneda: "GTQ" | "USD";
 }
 
+export interface DireccionEntrega {
+  id: string;
+  alias: string;
+  direccion: string;
+  departamentoId: string;
+  municipioId: string;
+  referencia?: string;
+}
+
 export interface Proveedor {
   id: string;
   nit: string;
@@ -20,6 +29,7 @@ export interface Proveedor {
   contactoNombre: string;
   diasCredito: number;
   datosBancarios: DatosBancarios;
+  direccionesEntrega: DireccionEntrega[];
   activo: boolean;
   createdAt: string;
 }
@@ -60,7 +70,22 @@ const RAW: ProveedorSeedInput[] = [
   { nombreComercial: "Naviera y Logística del Pacífico", razonSocial: "Naviera y Logística del Pacífico, S.A.", calle: "Puerto Quetzal, Bodega 14", departamentoId: "escuintla", municipioId: "escuintla-9", contactoNombre: "Alejandro José Recinos", diasCredito: 45, bancoIndex: 0, moneda: "USD" },
   { nombreComercial: "Servicios Aduanales Integrados", razonSocial: "Servicios Aduanales Integrados, S.A.", calle: "5a avenida 3-12 zona 4", departamentoId: "guatemala", municipioId: "guatemala-1", contactoNombre: "Heidy Marisol Chun", diasCredito: 15, bancoIndex: 3, moneda: "GTQ" },
   { nombreComercial: "Equipos de Extrusión y Soplado", razonSocial: "Equipos de Extrusión y Soplado de Centroamérica, S.A.", calle: "Km 16 Carretera a El Salvador", departamentoId: "guatemala", municipioId: "guatemala-5", contactoNombre: "Pablo Enrique Villatoro", diasCredito: 60, bancoIndex: 0, moneda: "USD" },
+  { nombreComercial: "Caja chica 1", razonSocial: "Caja Chica 1", calle: "Oficinas administrativas — Bodega Central Zona 12", departamentoId: "guatemala", municipioId: "guatemala-1", contactoNombre: "Encargado de Caja Chica", diasCredito: 0, bancoIndex: 0, moneda: "GTQ" },
 ];
+
+/** Direcciones de entrega sembradas por índice de proveedor (sobre `RAW`). */
+const DIRECCIONES_ENTREGA_SEED: Record<number, Omit<DireccionEntrega, "id">[]> = {
+  0: [
+    { alias: "Planta Amatitlán", direccion: "Km 21.5 Carretera a Amatitlán, Parque Industrial", departamentoId: "guatemala", municipioId: "guatemala-9", referencia: "Portón 3, recepción de materia prima" },
+    { alias: "Bodega Zona Franca", direccion: "Km 14.5 Carretera al Pacífico, Zona Franca", departamentoId: "guatemala", municipioId: "guatemala-3" },
+  ],
+  3: [
+    { alias: "Bodega central", direccion: "Zona 12 de Villa Nueva, Parque Industrial", departamentoId: "guatemala", municipioId: "guatemala-3", referencia: "Entregas de 7:00 a 15:00" },
+  ],
+  8: [
+    { alias: "Centro de acopio", direccion: "Km 88 Carretera al Pacífico", departamentoId: "escuintla", municipioId: "escuintla-1" },
+  ],
+};
 
 export const PROVEEDORES_SEED: Proveedor[] = RAW.map((raw, i) => {
   const id = `prov-${String(i + 1).padStart(3, "0")}`;
@@ -83,6 +108,10 @@ export const PROVEEDORES_SEED: Proveedor[] = RAW.map((raw, i) => {
       numeroCuenta: String(100000000 + i * 987654).slice(0, 12),
       moneda: raw.moneda,
     },
+    direccionesEntrega: (DIRECCIONES_ENTREGA_SEED[i] ?? []).map((d, j) => ({
+      ...d,
+      id: `${id}-dir-${j + 1}`,
+    })),
     activo: true,
     createdAt: new Date(2023, (i * 5) % 12, ((i * 11) % 27) + 1).toISOString(),
   };

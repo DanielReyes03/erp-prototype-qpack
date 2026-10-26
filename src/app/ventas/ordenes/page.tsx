@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
-import { Button } from "@heroui/react";
+import { Plus, Eye, Ban, Printer, Mail } from "lucide-react";
+import { Button, toast } from "@heroui/react";
 import { PageHeader } from "@/components/patterns/PageHeader";
 import { FilterBar } from "@/components/patterns/FilterBar";
 import { DataTable, type DataTableColumn } from "@/components/patterns/DataTable";
@@ -16,16 +16,16 @@ import type { OrdenVenta } from "@/lib/seed/ordenes-venta";
 import { clienteDe, vendedorDe } from "./_components/ov-helpers";
 
 const ESTADOS = [
-  { id: "borrador", label: "Borrador" },
-  { id: "confirmado", label: "Confirmado" },
-  { id: "despachado", label: "Despachado" },
-  { id: "entregado", label: "Entregado" },
+  { id: "recibido", label: "Recibido" },
   { id: "facturado", label: "Facturado" },
+  { id: "programado", label: "Programado" },
+  { id: "entregado", label: "Entregado" },
   { id: "anulado", label: "Anulado" },
 ];
 
 export default function OrdenesVentaPage() {
   const ordenes = useOrdenesVentaStore((s) => s.ordenes);
+  const anular = useOrdenesVentaStore((s) => s.anular);
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
@@ -82,7 +82,7 @@ export default function OrdenesVentaPage() {
     <div>
       <PageHeader
         title="Órdenes de venta"
-        description="Ciclo completo del pedido: confirmación, despacho, entrega y facturación"
+        description="Ciclo del pedido: recepción, facturación, programación en ruta y entrega"
         actions={
           <Button onPress={() => router.push("/ventas/ordenes/nueva")}>
             <Plus className="size-4" />
@@ -118,6 +118,46 @@ export default function OrdenesVentaPage() {
         emptyTitle="Sin órdenes de venta"
         emptyDescription="No se encontraron órdenes con los filtros actuales."
         onRowClick={(o) => router.push(`/ventas/ordenes/${o.id}`)}
+        rowActions={[
+          {
+            key: "abrir",
+            label: "Abrir detalle",
+            icon: Eye,
+            onSelect: (o) => router.push(`/ventas/ordenes/${o.id}`),
+          },
+          {
+            key: "imprimir",
+            label: "Imprimir",
+            icon: Printer,
+            onSelect: (o) => toast.success("Enviada a impresión", { description: o.id }),
+          },
+          {
+            key: "correo",
+            label: "Enviar por correo",
+            icon: Mail,
+            onSelect: (o) =>
+              toast.success("Orden enviada por correo", {
+                description: `${o.id} · ${clienteDe(o.clienteId)?.nombreComercial ?? ""}`.trim(),
+              }),
+          },
+          {
+            key: "anular",
+            label: "Anular",
+            icon: Ban,
+            isDanger: true,
+            isDisabled: (o) => o.estado === "anulado",
+            onSelect: async (o) => {
+              try {
+                await anular(o.id, "Anulada desde el listado de órdenes");
+                toast.success("Orden anulada", { description: o.id });
+              } catch (err) {
+                toast.danger("No se pudo anular", {
+                  description: err instanceof Error ? err.message : "Error desconocido",
+                });
+              }
+            },
+          },
+        ]}
       />
     </div>
   );

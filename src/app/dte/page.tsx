@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { FilePlus2 } from "lucide-react";
 import { Button } from "@heroui/react";
 import { PageHeader } from "@/components/patterns/PageHeader";
 import { FilterBar } from "@/components/patterns/FilterBar";
@@ -80,11 +80,11 @@ export default function DtePage() {
     <div>
       <PageHeader
         title="Documentos DTE"
-        description="Facturas, notas de crédito y notas de débito certificadas ante la SAT"
+        description="Facturas, notas de crédito y notas de débito certificadas ante la SAT. Las facturas se emiten al cerrar una orden de venta."
         actions={
-          <Button onPress={() => router.push("/dte/nuevo")}>
-            <Plus className="size-4" />
-            Emitir DTE
+          <Button variant="secondary" onPress={() => router.push("/dte/nuevo")}>
+            <FilePlus2 className="size-4" />
+            Nota de crédito / débito
           </Button>
         }
       />

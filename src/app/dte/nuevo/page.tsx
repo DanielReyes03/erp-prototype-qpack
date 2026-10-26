@@ -22,6 +22,10 @@ const TIPOS: { id: TipoDte; label: string }[] = [
   { id: "NDEB", label: "Nota de débito" },
 ];
 
+// Sin una orden de venta de origen solo se permiten notas de crédito/débito;
+// las facturas se emiten al cerrar la orden de venta.
+const TIPOS_DIRECTOS = TIPOS.filter((t) => t.id !== "FACT");
+
 export default function NuevoDtePage() {
   return (
     <Suspense fallback={null}>
@@ -42,7 +46,7 @@ function NuevoDteContent() {
 
   const ordenOrigen = ovId ? ordenes.find((o) => o.id === ovId) : undefined;
 
-  const [tipo, setTipo] = useState<TipoDte>("FACT");
+  const [tipo, setTipo] = useState<TipoDte>(ovId ? "FACT" : "NCRE");
   const [clienteId, setClienteId] = useState<string | null>(ordenOrigen?.clienteId ?? null);
   const [dteRelacionadoId, setDteRelacionadoId] = useState<string | null>(null);
   const [lineas, setLineas] = useState<LineItem[]>(ordenOrigen?.lineas ?? []);
@@ -105,11 +109,11 @@ function NuevoDteContent() {
       </Link>
 
       <PageHeader
-        title="Emitir DTE"
+        title={ordenOrigen ? "Emitir DTE" : "Nota de crédito / débito"}
         description={
           ordenOrigen
             ? `Se generará a partir de la orden de venta ${ordenOrigen.id}`
-            : "Emisión directa o nota de crédito/débito sobre una factura existente"
+            : "Nota de crédito o débito sobre una factura certificada existente"
         }
         actions={
           <Button isPending={isSaving} isDisabled={!canEmit} onPress={handleEmitir}>
@@ -131,7 +135,7 @@ function NuevoDteContent() {
           >
             <Tabs.ListContainer>
               <Tabs.List aria-label="Tipo de documento">
-                {TIPOS.map((t) => (
+                {TIPOS_DIRECTOS.map((t) => (
                   <Tabs.Tab key={t.id} id={t.id}>
                     {t.label}
                     <Tabs.Indicator />
@@ -254,7 +258,7 @@ function NuevoDteContent() {
           currency={dteRelacionado?.moneda ?? "GTQ"}
         />
       ) : (
-        <p className="text-sm text-slate-500">Seleccioná un cliente para agregar productos.</p>
+        <p className="text-sm text-slate-500">Selecciona un cliente para agregar productos.</p>
       )}
     </div>
   );

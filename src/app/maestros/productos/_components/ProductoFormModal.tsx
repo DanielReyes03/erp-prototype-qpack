@@ -8,6 +8,7 @@ import { FormModal } from "@/components/patterns/FormModal";
 import { FormTextField, FormSelect, FormNumberField, FormSwitch } from "@/components/patterns/form-fields";
 import { useProductosStore } from "@/lib/store/productos";
 import { CATEGORIAS_PRODUCTO, type Producto } from "@/lib/seed/productos";
+import { PROVEEDORES_SEED } from "@/lib/seed/proveedores";
 import {
   productoSchema,
   EMPTY_PRODUCTO_FORM,
@@ -27,9 +28,12 @@ function toFormValues(p: Producto): ProductoFormValues {
     nombre: p.nombre,
     categoria: p.categoria as ProductoFormValues["categoria"],
     unidadMedida: p.unidadMedida,
+    proveedorId: p.proveedorId ?? "",
     costo: p.costo,
     precioBase: p.precioBase,
     puntoReorden: p.puntoReorden,
+    stockMinimo: p.stockMinimo ?? p.puntoReorden,
+    stockMaximo: p.stockMaximo ?? p.puntoReorden * 3,
     activo: p.activo,
   };
 }
@@ -64,7 +68,7 @@ export function ProductoFormModal({ isOpen, onOpenChange, producto }: ProductoFo
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       title={isEditing ? "Editar producto" : "Nuevo producto"}
-      size="md"
+      size="lg"
       form={form}
       onSubmit={handleSubmit}
       submitLabel={isEditing ? "Guardar cambios" : "Crear producto"}
@@ -86,13 +90,25 @@ export function ProductoFormModal({ isOpen, onOpenChange, producto }: ProductoFo
         />
       </div>
       <FormTextField control={form.control} name="nombre" label="Descripción" isRequired />
-      <FormSelect
-        control={form.control}
-        name="unidadMedida"
-        label="Unidad de medida"
-        isRequired
-        options={UNIDADES_MEDIDA.map((u) => ({ id: u, label: u }))}
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <FormSelect
+          control={form.control}
+          name="unidadMedida"
+          label="Unidad de medida"
+          isRequired
+          options={UNIDADES_MEDIDA.map((u) => ({ id: u, label: u }))}
+        />
+        <FormSelect
+          control={form.control}
+          name="proveedorId"
+          label="Proveedor"
+          isRequired
+          options={PROVEEDORES_SEED.filter((p) => p.activo).map((p) => ({
+            id: p.id,
+            label: p.nombreComercial,
+          }))}
+        />
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <FormNumberField
           control={form.control}
@@ -111,14 +127,33 @@ export function ProductoFormModal({ isOpen, onOpenChange, producto }: ProductoFo
           isRequired
         />
       </div>
-      <FormNumberField
-        control={form.control}
-        name="puntoReorden"
-        label="Punto de reorden"
-        minValue={0}
-        isRequired
-        description="Existencia mínima antes de generar alerta de reabastecimiento"
-      />
+      <div className="grid grid-cols-3 gap-4">
+        <FormNumberField
+          control={form.control}
+          name="stockMinimo"
+          label="Stock mínimo"
+          minValue={0}
+          isRequired
+        />
+        <FormNumberField
+          control={form.control}
+          name="stockMaximo"
+          label="Stock máximo"
+          minValue={0}
+          isRequired
+        />
+        <FormNumberField
+          control={form.control}
+          name="puntoReorden"
+          label="Punto de reorden"
+          minValue={0}
+          isRequired
+        />
+      </div>
+      <p className="text-xs text-slate-500">
+        El punto de reorden dispara la alerta de reabastecimiento; los stocks mínimo y máximo
+        definen el rango objetivo de existencias.
+      </p>
       <FormSwitch control={form.control} name="activo" label="Producto activo" />
     </FormModal>
   );
